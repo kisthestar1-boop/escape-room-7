@@ -202,7 +202,7 @@ header.wrap{display:flex;justify-content:space-between;align-items:center;gap:8p
 
 <!-- 숨기 -->
 <div id="hideOv" class="ov hidden">
-  <p style="color:#93c5fd;font-weight:700;margin-bottom:14px">틈 사이로 무언가 지나간다… 숨을 참아라</p>
+  <p style="color:#93c5fd;font-weight:700;margin-bottom:14px">숨었다! 삐에로가 지나갈 때까지 아래 버튼을 <u>꾹 누르고</u> 있어라</p>
   <div id="slit"><img id="slitBg" alt=""><img id="slitClown" src="sehwa-clown.webp" alt="" onerror="this.style.display='none'"></div>
   <div id="breath"><div id="breathFill"></div></div>
   <button id="holdBtn">숨 참기 (길게 누르기 · 스페이스)</button>
@@ -243,6 +243,7 @@ header.wrap{display:flex;justify-content:space-between;align-items:center;gap:8p
   </div></div>
 </div>
 
+<div id="nameOv" class="ov hidden" style="z-index:90"><div class="card"><div class="bd"><span class="tag">ENTER</span><h2 style="font-size:20px">이름을 알려 주세요</h2><p style="color:var(--muted);font-size:13px;margin-top:4px">팀원들에게 이 이름으로 보여요</p><input id="nameIn" maxlength="12" style="width:100%;margin-top:10px;background:#000;border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--text);user-select:text" autocomplete="off"><button id="nameOk" class="big">입장하기</button></div></div></div>
 <div id="toasts"></div>
 <button id="tFab"><span id="tDot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#64748b;margin-right:5px"></span>👥 <span id="tCount">연결 중</span> <b id="tUnread" class="hidden" style="background:#ef4444;border-radius:99px;padding:0 5px;margin-left:3px">0</b></button>
 <div id="tPanel" class="hidden">
@@ -537,7 +538,7 @@ function renderInventory() {
     const id = state.inventory[i], b = document.createElement('button');
     if (id) {
       b.className = 'slot' + (state.selected === id ? ' sel' : '');
-      b.innerHTML = `<b>${ITEMS[id].i}</b>${ITEMS[id].n}`;
+      b.innerHTML = `<b>${ITEMS[id].i}</b>${ITEMS[id].n}${id === 'torch' ? (state.torchOn ? ' ON' : ' (눌러서 켜기)') : ''}`;
       b.onclick = () => useItem(id);
     } else { b.className = 'slot empty'; b.innerHTML = '<b>—</b>빈 칸'; b.disabled = true; }
     g.appendChild(b);
@@ -550,6 +551,7 @@ function useItem(id) {
     if (state.batteryUsed) { setMsg('건전지는 이미 썼다.'); return; }
     state.batteryUsed = true; state.battery = 100; state.selected = null; SFX.ok(); setMsg('건전지를 교체했다. 배터리 100%.'); renderInventory(); hud(); return;
   }
+  if (id === 'torch') { state.selected = null; renderInventory(); toggleTorch(); setMsg(state.torchOn ? '🔦 손전등을 켰다. (다시 누르면 끔)' : '손전등을 껐다.'); return; }
   if (state.selected === id) { openModal(ITEMS[id].n, `<div style="text-align:center;font-size:46px">${ITEMS[id].i}</div><p style="text-align:center">${ITEMS[id].d}</p>`); return; }
   state.selected = id; renderInventory();
 }
@@ -558,7 +560,7 @@ function useItem(id) {
 function toggleTorch() {
   if (!has('torch')) return;
   if (state.battery <= 0) { setMsg('배터리가 다 됐다. 🔋 건전지를 손전등에 사용하자.'); SFX.err(); return; }
-  state.torchOn = !state.torchOn; SFX.click(); renderScene();
+  state.torchOn = !state.torchOn; SFX.click(); renderInventory(); renderScene();
 }
 
 // ================= 삐에로 AI =================
@@ -612,7 +614,7 @@ function startHide() {
   const c = $('slitClown'); c.style.transition = 'none'; c.style.left = '-40%'; void c.offsetWidth; c.style.transition = 'left 4.5s linear';
   $('hideOv').classList.remove('hidden');
   setTimeout(() => { c.style.left = '110%'; }, 50);
-  let held = false, breath = 100, t = 0;
+  let held = false, breath = 100, t = 0, exposed = 0;
   const hb = $('holdBtn');
   const down = e => { e.preventDefault(); held = true; hb.classList.add('holding'); };
   const up = () => { held = false; hb.classList.remove('holding'); };
@@ -622,10 +624,10 @@ function startHide() {
   window.addEventListener('keydown', kd); window.addEventListener('keyup', ku);
   const iv = setInterval(() => {
     t += .1;
-    if (held) breath -= 2.1; else breath = Math.min(100, breath + 1);
+    if (held) breath -= 1.4; else { breath = Math.min(100, breath + 1); if (t > 1.5) exposed += .1; }
     $('breathFill').style.width = Math.max(0, breath) + '%';
     if (Math.random() < .25) SFX.step(.1);
-    const fail = (t > 1.0 && !held) || breath <= 0;
+    const fail = exposed >= 1.5 || breath <= 0;
     if (fail || t >= 4.6) {
       clearInterval(iv); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', ku); up();
       $('hideOv').classList.add('hidden');
@@ -803,6 +805,7 @@ const Team = (() => {
   const BASE = 'minsung/sehwa/v1/' + room + '/';
   const myId = Math.random().toString(36).slice(2, 10);
   let myName = ''; try { myName = localStorage.getItem('escape7_name') || ''; } catch (e) {}
+  let named = !!myName, pendingJoin = null;
   if (!myName) myName = '피험자' + (10 + Math.floor(Math.random() * 90));
   const players = {}; let client = null, lastKey = '', cache = null, unread = 0;
   const invite = () => location.origin + location.pathname + '?room=' + room;
@@ -845,7 +848,7 @@ const Team = (() => {
     client.publish(BASE + 'state', JSON.stringify({ from: myId, name: myName, s }), { retain: true, qos: 1 });
   }
   const myLoc = () => !state || !state.started ? '대기 중' : state.escaped ? '탈출 완료' : state.over ? '붙잡힘' : ROOMS[state.location];
-  const presence = leave => client && client.connected && client.publish(BASE + 'presence', JSON.stringify({ id: myId, name: myName, loc: myLoc(), leave: !!leave }));
+  const presence = leave => named && client && client.connected && client.publish(BASE + 'presence', JSON.stringify({ id: myId, name: myName, loc: myLoc(), leave: !!leave }));
   function renderPlayers() {
     const now = Date.now(); Object.keys(players).forEach(i => { if (now - players[i].t > 16000) delete players[i]; });
     const list = [{ name: myName, loc: myLoc(), me: true }, ...Object.values(players)];
@@ -861,7 +864,7 @@ const Team = (() => {
       b.querySelector('#rnOk').onclick = save; i.onkeydown = e => e.key === 'Enter' && save(); setTimeout(() => i.focus(), 50);
     });
   }
-  function setName(v) { myName = v; try { localStorage.setItem('escape7_name', v); } catch (e) {} $('startName').value = v; presence(); renderPlayers(); }
+  function setName(v) { myName = v; named = true; try { localStorage.setItem('escape7_name', v); } catch (e) {} $('startName').value = v; presence(); renderPlayers(); }
   function chat(name, text, mine, sys) {
     const box = $('tChat'), d = document.createElement('div');
     d.innerHTML = sys ? `<span style="color:#64748b">${esc(text)}</span>` : `<b style="color:${mine ? '#fca5a5' : '#6ee7b7'}">${esc(name)}</b> ${esc(text)}`;
@@ -877,6 +880,7 @@ const Team = (() => {
   }
   function autoJoin(from) {
     if (state.started) return;
+    if (!named) { pendingJoin = from || ''; return; }
     clearTimeout(introT); startNewGame(false);
     toast(`🚪 팀 게임에 참석했습니다${from ? ' · ' + from + '님과 함께' : ''}`);
   }
@@ -912,6 +916,11 @@ const Team = (() => {
     setInterval(() => publish(), 600);
     setInterval(() => { presence(); renderPlayers(); }, 5000);
     window.addEventListener('beforeunload', () => presence(true));
+    if (!named) {
+      $('nameOv').classList.remove('hidden');
+      const ok = () => { const v = $('nameIn').value.trim().slice(0, 12); if (!v) return; setName(v); $('nameOv').classList.add('hidden'); if (pendingJoin !== null) autoJoin(pendingJoin); };
+      $('nameOk').onclick = ok; $('nameIn').onkeydown = e => e.key === 'Enter' && ok(); setTimeout(() => $('nameIn').focus(), 100);
+    }
     renderPlayers(); connect();
   });
   return { onLocalStart, copy, toast };
