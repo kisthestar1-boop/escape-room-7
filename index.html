@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>제7호 임상실험동: 회색 복도의 문들 — 공포 스릴러 방탈출</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Noto Sans KR', 'Inter', sans-serif;
+      background-color: #07080b;
+      color: #e2e8f0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hotspot {
+      cursor: pointer;
+      transition: filter 0.2s ease, opacity 0.2s ease;
+    }
+    .hotspot:hover {
+      filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.75));
+    }
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+      20%, 24%, 55% { opacity: 0.45; }
+    }
+    .animate-flicker {
+      animation: flicker 4.5s infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .animate-shake {
+      animation: shake 0.35s ease-in-out;
+    }
+    .scanlines {
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 0px,
+        rgba(255, 255, 255, 0) 2px,
+        rgba(0, 0, 0, 0.16) 3px,
+        rgba(0, 0, 0, 0.16) 4px
+      );
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between bg-[#07080b] text-slate-200 overflow-x-hidden">
+
+  <!-- Start Screen Overlay -->
+  <div id="start-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4">
+    <div class="relative w-full max-w-2xl rounded-2xl overflow-hidden border border-red-900/50 shadow-2xl bg-[#0e1015]">
+      <!-- SVG Atmospheric Corridor Banner -->
+      <div class="relative aspect-video w-full overflow-hidden bg-[#0a0c10]">
+        <svg viewBox="0 0 800 450" class="w-full h-full block" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="corrBg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#11151c"/>
+              <stop offset="100%" stop-color="#07080c"/>
+            </linearGradient>
+            <radialGradient id="redAlert" cx="50%" cy="35%" r="55%">
+              <stop offset="0%" stop-color="rgba(220,38,38,0.28)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+            </radialGradient>
+          </defs>
+          <rect width="800" height="450" fill="url(#corrBg)"/>
+          <!-- Perspective Corridor -->
+          <polygon points="0,0 260,110 260,340 0,450" fill="#181d26" stroke="#28303d" stroke-width="2"/>
+          <polygon points="800,0 540,110 540,340 800,450" fill="#181d26" stroke="#28303d" stroke-width="2"/>
+          <rect x="260" y="110" width="280" height="230" fill="#0d1017" stroke="#28303d" stroke-width="2"/>
+          <polygon points="0,450 260,340 540,340 800,450" fill="#12161f"/>
+          <!-- Doors along walls -->
+          <polygon points="55,65 130,98 130,395 55,425" fill="#1f2530" stroke="#334155" stroke-width="2"/>
+          <polygon points="165,112 220,132 220,358 165,378" fill="#1f2530" stroke="#334155" stroke-width="2"/>
+          <polygon points="670,98 745,65 745,425 670,395" fill="#1f2530" stroke="#334155" stroke-width="2"/>
+          <polygon points="580,132 635,112 635,378 580,358" fill="#1f2530" stroke="#334155" stroke-width="2"/>
+          <!-- Center Exit Door -->
+          <rect x="345" y="155" width="110" height="185" fill="#1a1f29" stroke="#7f1d1d" stroke-width="3"/>
+          <rect x="372" y="128" width="56" height="18" rx="3" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+          <text x="400" y="141" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700">EXIT</text>
+          <!-- Flickering Ceiling Lights -->
+          <rect x="350" y="42" width="100" height="8" rx="4" fill="#e2e8f0" class="animate-flicker"/>
+          <rect width="800" height="450" fill="url(#redAlert)"/>
+        </svg>
+        <div class="scanlines pointer-events-none absolute inset-0"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0e1015] via-[#0e1015]/50 to-transparent"></div>
+        <div class="absolute bottom-4 left-6 right-6">
+          <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-red-500/20 text-red-300 border border-red-500/40 mb-2">
+            Horror &amp; Thriller Escape Room
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-bold text-slate-100 tracking-tight">
+            제7호 임상실험동: 회색 복도의 문들
+          </h1>
+        </div>
+      </div>
+
+      <div class="p-6 sm:p-7 space-y-5">
+        <p class="text-sm text-slate-300 leading-relaxed">
+          고액 보수 임상실험에 지원해 잠들었다 깨어나니, 차가운 회색 복도와 굳게 닫힌 철문들이 눈앞에 펼쳐져 있습니다. 인터콤 너머 감시자의 목소리가 들려오는 가운데, 각 방에 숨겨진 기록을 모아 <strong class="text-red-400">비상 탈출구</strong>를 열어야 합니다.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs text-slate-400">
+          <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+            <div class="text-red-300 font-semibold mb-1">1. 구역 이동</div>
+            복도의 문을 클릭해 101·102·103호와 비상구를 오가세요.
+          </div>
+          <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+            <div class="text-red-300 font-semibold mb-1">2. 어둠과 도구</div>
+            어두운 관찰실에서는 손전등을 선택해 조사해야 합니다.
+          </div>
+          <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+            <div class="text-red-300 font-semibold mb-1">3. 함께 탈출</div>
+            초대 링크를 채팅방에 보내면 친구들과 같은 방에서 실시간으로 함께 풉니다.
+          </div>
+        </div>
+        <div class="rounded-xl bg-white/5 border border-white/10 p-3 space-y-2">
+          <div class="flex items-center gap-2">
+            <label for="start-name" class="text-xs text-slate-400 shrink-0">내 이름</label>
+            <input id="start-name" maxlength="12" class="flex-1 min-w-0 px-3 py-2 rounded-lg bg-black/50 border border-white/15 text-sm text-slate-100 select-text" autocomplete="off"/>
+            <button id="start-invite" type="button" class="shrink-0 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-semibold text-slate-100 cursor-pointer">🔗 초대 링크 복사</button>
+          </div>
+          <p id="start-team" class="text-[11px] text-emerald-300">팀원을 찾는 중…</p>
+        </div>
+        <button id="btn-start-game"
+                class="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-500 active:scale-[0.99] text-white font-bold text-base shadow-lg shadow-red-600/25 transition cursor-pointer">
+          임상실험동 탐색 시작 →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top HUD -->
+  <header class="w-full max-w-5xl px-3 sm:px-6 pt-3 pb-2 flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-1.5">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+        <span id="location-title" class="text-xs sm:text-sm font-semibold text-slate-100">중앙 회색 복도</span>
+      </div>
+      <div class="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5">
+        <span>진행</span>
+        <span id="progress-badge" class="font-bold text-red-400">0 / 4</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <div id="timer-display" class="bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs sm:text-sm font-mono text-slate-200">
+        00:00
+      </div>
+      <button id="btn-notebook" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs sm:text-sm text-slate-200 transition cursor-pointer flex items-center gap-1">
+        <span>📋</span><span class="hidden sm:inline">단서</span>
+        <span id="clue-count" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-500/20 text-red-300 font-bold">0</span>
+      </button>
+      <button id="btn-share" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs sm:text-sm text-slate-200 transition cursor-pointer flex items-center gap-1">
+        <span>🔗</span><span class="hidden sm:inline">공유</span>
+      </button>
+      <button id="btn-hint" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-xs sm:text-sm font-medium text-red-300 transition cursor-pointer">
+        💡 힌트
+      </button>
+      <button id="btn-sound" class="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs sm:text-sm text-slate-300 transition cursor-pointer" title="사운드 켜기/끄기">
+        🔊
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Stage -->
+  <main class="w-full max-w-5xl px-3 sm:px-6 flex-1 flex flex-col justify-center gap-2.5 my-1">
+    <div class="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-[#0d1017]">
+      <svg id="scene-svg" viewBox="0 0 960 540" class="w-full h-full block" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="scanlines pointer-events-none absolute inset-0 opacity-50"></div>
+
+      <!-- Back to Corridor Button (shown inside rooms) -->
+      <button id="btn-back-corridor"
+              class="hidden absolute top-3 left-3 px-3 py-1.5 rounded-xl bg-black/70 hover:bg-black/90 border border-white/20 text-xs sm:text-sm font-medium text-slate-100 transition cursor-pointer backdrop-blur-sm z-10">
+        ← 복도로 나가기
+      </button>
+    </div>
+
+    <!-- Watcher / Narrative Message Bar -->
+    <div class="w-full rounded-xl bg-[#10131c] border border-white/10 px-4 py-2.5 flex items-center justify-between gap-3 min-h-[46px]">
+      <p id="message-bar" class="text-xs sm:text-sm text-slate-200 leading-snug">
+        [인터콤] "실험을 시작하지. 복도의 문들을 확인하고 탈출 조건을 찾아내라."
+      </p>
+      <span id="selected-item-pill" class="hidden shrink-0 px-2.5 py-1 rounded-lg bg-red-500/20 border border-red-400/40 text-red-300 text-xs font-semibold"></span>
+    </div>
+  </main>
+
+  <!-- Inventory Bar -->
+  <footer class="w-full max-w-5xl px-3 sm:px-6 pb-3 pt-1">
+    <div class="rounded-2xl bg-[#10131c] border border-white/10 p-2.5 sm:p-3">
+      <div class="flex items-center justify-between mb-2 px-1">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">소지품 (클릭하여 선택)</span>
+        <button id="btn-inspect-item" class="hidden text-xs text-red-300 hover:text-red-200 underline cursor-pointer">
+          선택한 물건 자세히 보기
+        </button>
+      </div>
+      <div id="inventory-grid" class="grid grid-cols-4 gap-2 sm:gap-3"></div>
+    </div>
+  </footer>
+
+  <!-- Generic Modal -->
+  <div id="modal-backdrop" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-2xl bg-[#121621] border border-red-500/30 shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-white/5">
+        <h2 id="modal-title" class="text-base sm:text-lg font-bold text-slate-100">제목</h2>
+        <button id="btn-close-modal" class="w-8 h-8 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer">✕</button>
+      </div>
+      <div id="modal-body" class="p-5 max-h-[75vh] overflow-y-auto space-y-4 text-sm text-slate-200"></div>
+    </div>
+  </div>
+
+  <!-- Victory Screen -->
+  <div id="victory-screen" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-lg rounded-2xl bg-[#111520] border border-emerald-500/40 shadow-2xl p-6 sm:p-8 text-center space-y-5">
+      <div class="w-16 h-16 mx-auto rounded-full bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-3xl">
+        🚪
+      </div>
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-widest text-emerald-400">Experiment Terminated</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-100 mt-1">제7호 실험동 탈출 성공!</h2>
+      </div>
+      <p class="text-sm text-slate-300 leading-relaxed">
+        비상 탈출구의 묵직한 철문이 열리고 차가운 바깥 공기가 밀려 들어옵니다. 당신은 감시자의 손아귀에서 무사히 빠져나왔습니다.
+      </p>
+      <div class="grid grid-cols-2 gap-3 bg-white/5 rounded-xl p-4 border border-white/10 text-sm">
+        <div>
+          <div class="text-xs text-slate-400">탈출 시간</div>
+          <div id="final-time" class="text-lg font-mono font-bold text-emerald-300 mt-0.5">00:00</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400">사용한 힌트</div>
+          <div id="final-hints" class="text-lg font-mono font-bold text-emerald-300 mt-0.5">0회</div>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-2.5">
+        <button id="btn-copy-result" class="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-slate-100 font-semibold text-sm transition cursor-pointer">
+          📋 채팅방에 기록 복사
+        </button>
+        <button id="btn-restart" class="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition cursor-pointer">
+          다시 플레이하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // Synthesized Horror Sound Engine
+    // ==========================================
+    const SoundFX = (() => {
+      let ctx = null;
+      let muted = false;
+
+      function ensureCtx() {
+        if (!ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) ctx = new AudioCtx();
+        }
+        if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      }
+
+      function tone(freq, type = 'sine', dur = 0.1, vol = 0.1, delay = 0) {
+        if (muted) return;
+        ensureCtx();
+        if (!ctx) return;
+        const now = ctx.currentTime + delay;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(vol, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + dur);
+      }
+
+      return {
+        init: ensureCtx,
+        toggleMute: () => { muted = !muted; return muted; },
+        click: () => tone(420, 'triangle', 0.05, 0.07),
+        door: () => { tone(110, 'sawtooth', 0.18, 0.08); tone(85, 'sine', 0.25, 0.1, 0.05); },
+        beep: () => tone(880, 'square', 0.05, 0.06),
+        error: () => { tone(160, 'sawtooth', 0.15, 0.1); tone(120, 'sawtooth', 0.2, 0.1, 0.1); },
+        pickup: () => { tone(520, 'sine', 0.1, 0.1); tone(780, 'sine', 0.16, 0.11, 0.08); },
+        unlock: () => {
+          tone(330, 'triangle', 0.1, 0.12);
+          tone(440, 'triangle', 0.1, 0.12, 0.08);
+          tone(660, 'triangle', 0.22, 0.13, 0.16);
+        },
+        escape: () => {
+          [440, 554.37, 659.25, 880].forEach((f, i) => tone(f, 'triangle', 0.35, 0.12, i * 0.11));
+        }
+      };
+    })();
+
+    // ==========================================
+    // Items & State
+    // ==========================================
+    const ITEMS = {
+      card_102: {
+        id: 'card_102',
+        name: '102호 카드키',
+        icon: '💳',
+        desc: '관찰실(102호) 출입 권한이 담긴 마그네틱 보안 카드입니다.'
+      },
+      flashlight: {
+        id: 'flashlight',
+        name: '자외선 손전등',
+        icon: '🔦',
+        desc: '어두운 방을 비추거나 특수 혈흔·형광 흔적을 확인하는 고출력 손전등입니다.'
+      },
+      master_key: {
+        id: 'master_key',
+        name: '차단기 키',
+        icon: '🗝️',
+        desc: '비상 탈출구의 보조 전력 차단 장치를 해제하는 붉은 손잡이 열쇠입니다.'
+      }
+    };
+
+    const LOCATION_NAMES = {
+      corridor: '중앙 회색 복도',
+      room101: '101호 · 피험자 대기실',
+      room102: '102호 · 암흑 관찰실',
+      room103: '103호 · 약품 보관실'
+    };
+
+    let state = {};
+    let timerInterval = null;
+
+    function createInitialState() {
+      return {
+        started: false,
+        escaped: false,
+        location: 'corridor',
+        lockerOpen: false,
+        room102Unlocked: false,
+        mirrorRevealed: false,
+        room103Unlocked: false,
+        labSolved: false,
+        labSeq: [],
+        exitBreakerUnlocked: false,
+        inventory: [],
+        selectedItem: null,
+        clues: [],
+        hintsUsed: 0,
+        elapsedSeconds: 0,
+        lockerDial: [0, 0, 0],
+        round: 0
+      };
+    }
+
+    function setMessage(msg) {
+      document.getElementById('message-bar').textContent = msg;
+    }
+
+    function addClue(id, title, detail) {
+      if (!state.clues.some(c => c.id === id)) {
+        state.clues.push({ id, title, detail });
+        updateHUD();
+      }
+    }
+
+    function addItem(id) {
+      if (!state.inventory.includes(id)) {
+        state.inventory.push(id);
+        SoundFX.pickup();
+        renderInventory();
+      }
+    }
+
+    function formatTime(sec) {
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function getProgressCount() {
+      let c = 0;
+      if (state.lockerOpen) c++;
+      if (state.mirrorRevealed) c++;
+      if (state.labSolved) c++;
+      if (state.exitBreakerUnlocked) c++;
+      return c;
+    }
+
+    function updateHUD() {
+      document.getElementById('location-title').textContent = LOCATION_NAMES[state.location];
+      document.getElementById('progress-badge').textContent = `${getProgressCount()} / 4`;
+      document.getElementById('clue-count').textContent = state.clues.length;
+      document.getElementById('timer-display').textContent = formatTime(state.elapsedSeconds);
+      document.getElementById('btn-back-corridor').classList.toggle('hidden', state.location === 'corridor');
+    }
+
+    function renderInventory() {
+      const grid = document.getElementById('inventory-grid');
+      grid.innerHTML = '';
+      for (let i = 0; i < 4; i++) {
+        const id = state.inventory[i];
+        const btn = document.createElement('button');
+        if (id) {
+          const item = ITEMS[id];
+          const active = state.selectedItem === id;
+          btn.className = `flex flex-col items-center justify-center rounded-xl py-2 px-1 border transition cursor-pointer ${
+            active ? 'bg-red-500/20 border-red-400' : 'bg-white/5 hover:bg-white/10 border-white/10'
+          }`;
+          btn.innerHTML = `
+            <span class="text-xl sm:text-2xl leading-none">${item.icon}</span>
+            <span class="text-[10px] sm:text-xs font-medium mt-1 truncate max-w-full ${active ? 'text-red-300' : 'text-slate-300'}">${item.name}</span>
+          `;
+          btn.addEventListener('click', () => {
+            SoundFX.click();
+            state.selectedItem = state.selectedItem === id ? null : id;
+            renderInventory();
+          });
+        } else {
+          btn.className = 'flex flex-col items-center justify-center rounded-xl py-2 px-1 border border-white/5 bg-black/30 opacity-40 cursor-default';
+          btn.innerHTML = `<span class="text-lg text-slate-600">—</span><span class="text-[10px] text-slate-600 mt-1">비어 있음</span>`;
+          btn.disabled = true;
+        }
+        grid.appendChild(btn);
+      }
+
+      const pill = document.getElementById('selected-item-pill');
+      const inspectBtn = document.getElementById('btn-inspect-item');
+      if (state.selectedItem && ITEMS[state.selectedItem]) {
+        pill.textContent = `선택됨: ${ITEMS[state.selectedItem].name}`;
+        pill.classList.remove('hidden');
+        inspectBtn.classList.remove('hidden');
+      } else {
+        pill.classList.add('hidden');
+        inspectBtn.classList.add('hidden');
+      }
+    }
+
+    // ==========================================
+    // Modal Helpers
+    // ==========================================
+    function openModal(title, html, onBind) {
+      document.getElementById('modal-title').textContent = title;
+      const body = document.getElementById('modal-body');
+      body.innerHTML = html;
+      document.getElementById('modal-backdrop').classList.remove('hidden');
+      if (onBind) onBind(body);
+    }
+
+    function closeModal() {
+      document.getElementById('modal-backdrop').classList.add('hidden');
+    }
+
+    // ==========================================
+    // Scene Rendering
+    // ==========================================
+    function renderScene() {
+      updateHUD();
+      const svg = document.getElementById('scene-svg');
+      let content = '';
+
+      if (state.location === 'corridor') {
+        content = `
+          <defs>
+            <linearGradient id="cWall" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1b2029"/>
+              <stop offset="100%" stop-color="#0f1218"/>
+            </linearGradient>
+          </defs>
+          <rect width="960" height="400" fill="url(#cWall)"/>
+          <rect x="0" y="400" width="960" height="140" fill="#0b0d12"/>
+          <line x1="0" y1="400" x2="960" y2="400" stroke="#334155" stroke-width="3"/>
+          <!-- Flickering ceiling tubes -->
+          <rect x="180" y="22" width="140" height="10" rx="5" fill="#cbd5e1" class="animate-flicker"/>
+          <rect x="640" y="22" width="140" height="10" rx="5" fill="#cbd5e1" class="animate-flicker"/>
+
+          <!-- Notice Board -->
+          <g id="obj-notice" class="hotspot">
+            <rect x="60" y="135" width="110" height="130" rx="4" fill="#1e293b" stroke="#475569" stroke-width="3"/>
+            <rect x="74" y="152" width="82" height="96" fill="#e2e8f0"/>
+            <line x1="84" y1="170" x2="146" y2="170" stroke="#dc2626" stroke-width="3"/>
+            <line x1="84" y1="186" x2="140" y2="186" stroke="#334155" stroke-width="2"/>
+            <line x1="84" y1="202" x2="144" y2="202" stroke="#334155" stroke-width="2"/>
+            <line x1="84" y1="218" x2="130" y2="218" stroke="#334155" stroke-width="2"/>
+            <text x="115" y="285" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="600">실험 수칙</text>
+          </g>
+
+          <!-- Door 101 -->
+          <g id="obj-door-101" class="hotspot">
+            <rect x="200" y="120" width="130" height="280" rx="3" fill="#272e3a" stroke="#475569" stroke-width="4"/>
+            <rect x="235" y="150" width="60" height="28" rx="3" fill="#0f172a" stroke="#64748b"/>
+            <text x="265" y="169" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="700">101호</text>
+            <circle cx="312" cy="265" r="7" fill="#94a3b8"/>
+            <text x="265" y="424" text-anchor="middle" fill="#86efac" font-size="12">피험자 대기실 (열림)</text>
+          </g>
+
+          <!-- Door 102 -->
+          <g id="obj-door-102" class="hotspot">
+            <rect x="360" y="120" width="130" height="280" rx="3" fill="#272e3a" stroke="#475569" stroke-width="4"/>
+            <rect x="395" y="150" width="60" height="28" rx="3" fill="#0f172a" stroke="#64748b"/>
+            <text x="425" y="169" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="700">102호</text>
+            <rect x="468" y="245" width="14" height="26" rx="2" fill="${state.room102Unlocked ? '#16a34a' : '#dc2626'}"/>
+            <text x="425" y="424" text-anchor="middle" fill="${state.room102Unlocked ? '#86efac' : '#fca5a5'}" font-size="12">
+              ${state.room102Unlocked ? '관찰실 (열림)' : '관찰실 (카드키 필요)'}
+            </text>
+          </g>
+
+          <!-- Door 103 -->
+          <g id="obj-door-103" class="hotspot">
+            <rect x="520" y="120" width="130" height="280" rx="3" fill="#272e3a" stroke="#475569" stroke-width="4"/>
+            <rect x="555" y="150" width="60" height="28" rx="3" fill="#0f172a" stroke="#64748b"/>
+            <text x="585" y="169" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="700">103호</text>
+            <rect x="626" y="245" width="16" height="28" rx="2" fill="${state.room103Unlocked ? '#16a34a' : '#dc2626'}"/>
+            <text x="585" y="424" text-anchor="middle" fill="${state.room103Unlocked ? '#86efac' : '#fca5a5'}" font-size="12">
+              ${state.room103Unlocked ? '약품실 (열림)' : '약품실 (비밀번호)'}
+            </text>
+          </g>
+
+          <!-- Emergency Exit -->
+          <g id="obj-exit" class="hotspot">
+            <rect x="705" y="100" width="175" height="300" rx="4" fill="#1e242e" stroke="#7f1d1d" stroke-width="5"/>
+            <rect x="748" y="64" width="90" height="26" rx="4" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+            <text x="793" y="82" text-anchor="middle" fill="#fca5a5" font-size="13" font-weight="700">EXIT</text>
+            <!-- Heavy bars -->
+            <rect x="720" y="220" width="145" height="14" rx="2" fill="#475569"/>
+            <circle cx="852" cy="255" r="9" fill="${state.exitBreakerUnlocked ? '#22c55e' : '#ef4444'}"/>
+            <text x="793" y="424" text-anchor="middle" fill="#fca5a5" font-size="12" font-weight="600">비상 탈출구</text>
+          </g>
+
+          <!-- Intercom / CCTV -->
+          <g id="obj-intercom" class="hotspot">
+            <circle cx="895" cy="70" r="14" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+            <circle cx="895" cy="70" r="5" fill="#ef4444" class="animate-pulse"/>
+            <text x="895" y="102" text-anchor="middle" fill="#94a3b8" font-size="11">감시자</text>
+          </g>
+        `;
+      } else if (state.location === 'room101') {
+        content = `
+          <rect width="960" height="400" fill="#141820"/>
+          <rect x="0" y="400" width="960" height="140" fill="#0b0d12"/>
+          <line x1="0" y1="400" x2="960" y2="400" stroke="#334155" stroke-width="3"/>
+
+          <!-- Metal Locker -->
+          <g id="obj-locker" class="hotspot">
+            <rect x="170" y="95" width="180" height="305" rx="4" fill="#28313e" stroke="#475569" stroke-width="4"/>
+            <line x1="190" y1="120" x2="330" y2="120" stroke="#0f172a" stroke-width="5"/>
+            <line x1="190" y1="135" x2="330" y2="135" stroke="#0f172a" stroke-width="5"/>
+            <circle cx="322" cy="250" r="12" fill="${state.lockerOpen ? '#16a34a' : '#dc2626'}" stroke="#cbd5e1" stroke-width="2"/>
+            <text x="260" y="424" text-anchor="middle" fill="#cbd5e1" font-size="13" font-weight="600">
+              ${state.lockerOpen ? '열린 철제 사물함' : '잠긴 철제 사물함 (3자리)'}
+            </text>
+          </g>
+
+          <!-- Examination Table & Clipboard -->
+          <rect x="440" y="310" width="380" height="22" rx="3" fill="#334155"/>
+          <rect x="465" y="332" width="20" height="68" fill="#1e293b"/>
+          <rect x="775" y="332" width="20" height="68" fill="#1e293b"/>
+
+          <g id="obj-chart" class="hotspot">
+            <rect x="520" y="288" width="95" height="22" rx="2" fill="#94a3b8"/>
+            <rect x="530" y="284" width="75" height="18" fill="#f8fafc"/>
+            <text x="567" y="272" text-anchor="middle" fill="#fca5a5" font-size="13" font-weight="600">피험자 진료 차트</text>
+          </g>
+
+          <!-- Wall Sign -->
+          <g id="obj-wall-note-101" class="hotspot">
+            <rect x="580" y="130" width="170" height="100" rx="4" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+            <text x="665" y="175" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">헬리오스 바이오</text>
+            <text x="665" y="198" text-anchor="middle" fill="#94a3b8" font-size="12">설립 연도: 2019년</text>
+          </g>
+        `;
+      } else if (state.location === 'room102') {
+        content = `
+          <rect width="960" height="400" fill="#07090e"/>
+          <rect x="0" y="400" width="960" height="140" fill="#050609"/>
+          <line x1="0" y1="400" x2="960" y2="400" stroke="#1e293b" stroke-width="3"/>
+
+          <!-- One-way Mirror -->
+          <g id="obj-mirror" class="hotspot">
+            <rect x="160" y="95" width="380" height="210" rx="6" fill="#0f172a" stroke="#334155" stroke-width="5"/>
+            ${state.mirrorRevealed ? `
+              <text x="350" y="165" text-anchor="middle" fill="#ef4444" font-size="18" font-weight="700">103호 키패드: 3815</text>
+              <text x="350" y="205" text-anchor="middle" fill="#38bdf8" font-size="15" font-weight="700">시약 배합 순서:</text>
+              <text x="350" y="235" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700">파랑 → 노랑 → 빨강 → 초록</text>
+            ` : `
+              <text x="350" y="200" text-anchor="middle" fill="#475569" font-size="14">어두운 매직 미러 (빛을 비춰야 보일 듯하다)</text>
+            `}
+          </g>
+
+          <!-- Voice Recorder on Table -->
+          <rect x="610" y="310" width="220" height="90" rx="4" fill="#111827" stroke="#1f2937" stroke-width="2"/>
+          <g id="obj-recorder" class="hotspot">
+            <rect x="665" y="286" width="110" height="24" rx="4" fill="#334155" stroke="#64748b"/>
+            <circle cx="690" cy="298" r="5" fill="#ef4444"/>
+            <text x="720" y="272" text-anchor="middle" fill="#fca5a5" font-size="13" font-weight="600">연구원의 녹음기</text>
+          </g>
+        `;
+      } else if (state.location === 'room103') {
+        const vials = [
+          { id: 'blue', label: '파랑', color: '#2563eb', x: 180 },
+          { id: 'yellow', label: '노랑', color: '#eab308', x: 255 },
+          { id: 'red', label: '빨강', color: '#dc2626', x: 330 },
+          { id: 'green', label: '초록', color: '#16a34a', x: 405 }
+        ];
+        content = `
+          <rect width="960" height="400" fill="#111822"/>
+          <rect x="0" y="400" width="960" height="140" fill="#090c12"/>
+          <line x1="0" y1="400" x2="960" y2="400" stroke="#334155" stroke-width="3"/>
+
+          <!-- Reagent Mixing Console -->
+          <rect x="140" y="135" width="350" height="230" rx="8" fill="#1e293b" stroke="#475569" stroke-width="3"/>
+          <text x="315" y="168" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="700">
+            ${state.labSolved ? '해독 완료 — 비상구 보조키 획득' : '시약 배합 장치 (순서대로 주입)'}
+          </text>
+
+          ${vials.map(v => {
+            const used = state.labSeq.includes(v.id) || state.labSolved;
+            return `
+              <g class="hotspot vial-btn" data-vial="${v.id}">
+                <rect x="${v.x}" y="${used ? 215 : 200}" width="50" height="100" rx="8" fill="${v.color}" opacity="${used ? 0.55 : 0.95}" stroke="#ffffff44" stroke-width="2"/>
+                <text x="${v.x + 25}" y="${used ? 270 : 255}" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">${v.label}</text>
+              </g>
+            `;
+          }).join('')}
+
+          <!-- Director Terminal -->
+          <g id="obj-terminal" class="hotspot">
+            <rect x="590" y="160" width="230" height="155" rx="8" fill="#0f172a" stroke="#475569" stroke-width="4"/>
+            <rect x="608" y="178" width="194" height="118" fill="#052e16"/>
+            <text x="705" y="220" text-anchor="middle" fill="#4ade80" font-size="14" font-weight="700">DIRECTOR TERMINAL</text>
+            <text x="705" y="248" text-anchor="middle" fill="#86efac" font-size="12">비상구 보안 코드 확인</text>
+            <rect x="680" y="315" width="50" height="85" fill="#334155"/>
+          </g>
+        `;
+      }
+
+      svg.innerHTML = content;
+      bindSceneEvents();
+    }
+
+    // ==========================================
+    // Event Binding
+    // ==========================================
+    function bindSceneEvents() {
+      const notice = document.getElementById('obj-notice');
+      if (notice) notice.addEventListener('click', () => {
+        SoundFX.click();
+        addClue('rule', '복도 실험 수칙', '피험자 번호: No. 07 (당신은 07번 실험체입니다.)');
+        openModal('임상실험동 수칙', `
+          <div class="space-y-2.5 bg-slate-900 p-4 rounded-xl border border-slate-700 text-slate-200">
+            <p class="text-red-400 font-bold">제1조. 지정된 방 외에는 무단 침입을 금한다.</p>
+            <p>제2조. 당신의 피험자 고유 번호는 <strong class="text-amber-300 font-mono">07번</strong>이다.</p>
+            <p>제3조. 정전이나 암흑 구역에서는 지급된 손전등을 사용하라.</p>
+          </div>
+        `);
+      });
+
+      const intercom = document.getElementById('obj-intercom');
+      if (intercom) intercom.addEventListener('click', () => {
+        SoundFX.beep();
+        const lines = [
+          '[감시자] "시간이 많지 않아, 07번. 101호부터 샅샅이 뒤져보는 게 좋을 거다."',
+          '[감시자] "아직도 복도를 서성이고 있나? 102호의 어둠을 두려워하지 마라."',
+          '[감시자] "약품실까지 들어갔다니 제법이군. 하지만 비상구는 쉽게 열리지 않을 거다."'
+        ];
+        const idx = state.room103Unlocked ? 2 : (state.room102Unlocked ? 1 : 0);
+        setMessage(lines[idx]);
+      });
+
+      const d101 = document.getElementById('obj-door-101');
+      if (d101) d101.addEventListener('click', () => {
+        SoundFX.door();
+        state.location = 'room101';
+        setMessage('101호 대기실에 들어왔습니다. 차가운 진료대와 철제 사물함이 보입니다.');
+        renderScene();
+      });
+
+      const d102 = document.getElementById('obj-door-102');
+      if (d102) d102.addEventListener('click', () => {
+        if (state.room102Unlocked) {
+          SoundFX.door();
+          state.location = 'room102';
+          setMessage('102호 관찰실입니다. 내부가 칠흑같이 어둡습니다.');
+          renderScene();
+          return;
+        }
+        if (state.selectedItem === 'card_102') {
+          state.room102Unlocked = true;
+          state.selectedItem = null;
+          SoundFX.unlock();
+          renderInventory();
+          state.location = 'room102';
+          setMessage('102호 카드키를 인식시켜 문을 열었습니다!');
+          renderScene();
+        } else {
+          SoundFX.error();
+          setMessage('102호 문이 잠겨 있습니다. [102호 카드키]를 선택해 태그하세요.');
+        }
+      });
+
+      const d103 = document.getElementById('obj-door-103');
+      if (d103) d103.addEventListener('click', () => {
+        if (state.room103Unlocked) {
+          SoundFX.door();
+          state.location = 'room103';
+          setMessage('103호 약품 보관실에 들어왔습니다.');
+          renderScene();
+          return;
+        }
+        SoundFX.click();
+        openKeypadModal('103호 약품실 키패드', '4자리 출입 코드를 입력하세요.', '3815', () => {
+          state.room103Unlocked = true;
+          SoundFX.unlock();
+          state.location = 'room103';
+          setMessage('철컥! 103호 약품 보관실 문이 열렸습니다.');
+          renderScene();
+        });
+      });
+
+      const exitDoor = document.getElementById('obj-exit');
+      if (exitDoor) exitDoor.addEventListener('click', () => {
+        if (!state.exitBreakerUnlocked) {
+          if (state.selectedItem === 'master_key') {
+            state.exitBreakerUnlocked = true;
+            state.selectedItem = null;
+            SoundFX.unlock();
+            renderInventory();
+            renderScene();
+            setMessage('차단기 키로 보조 잠금을 해제했습니다! 이제 비상구를 다시 클릭해 최종 코드를 입력하세요.');
+          } else {
+            SoundFX.error();
+            setMessage('비상 탈출구 보조 잠금장치가 걸려 있습니다. 103호에서 [차단기 키]를 찾아오세요.');
+          }
+          return;
+        }
+        SoundFX.click();
+        openKeypadModal('비상 탈출구 최종 보안', '설립 연도와 피험자 번호를 조합한 최종 코드를 입력하세요.', '2012', () => {
+          triggerVictory();
+        });
+      });
+
+      // Room 101
+      const chart = document.getElementById('obj-chart');
+      if (chart) chart.addEventListener('click', () => {
+        SoundFX.click();
+        addClue('chart', '피험자 진료 차트', '사물함 비밀번호(실종자 마지막 자리): 729');
+        openModal('피험자 진료 차트', `
+          <div class="space-y-3 bg-slate-900 p-4 rounded-xl border border-slate-700">
+            <p class="text-slate-300">혈흔이 묻은 진료 기록지입니다.</p>
+            <div class="p-3 rounded-lg bg-black/50 border border-red-900/50 text-sm space-y-1">
+              <div>• 피험자 김OO (No. 10<strong class="text-red-400">7</strong>) — 실종</div>
+              <div>• 피험자 박OO (No. 20<strong class="text-red-400">2</strong>) — 실종</div>
+              <div>• 피험자 이OO (No. 30<strong class="text-red-400">9</strong>) — 실종</div>
+            </div>
+            <p class="text-xs text-slate-400">메모: "사물함 번호는 순서대로 마지막 숫자 세 자리."</p>
+          </div>
+        `);
+      });
+
+      const wall101 = document.getElementById('obj-wall-note-101');
+      if (wall101) wall101.addEventListener('click', () => {
+        SoundFX.click();
+        addClue('founded', '헬리오스 바이오 설립 연도', '설립 연도: 2019년');
+        setMessage('벽면 명판을 확인했습니다: "헬리오스 바이오 — 설립 연도 2019년"');
+      });
+
+      const locker = document.getElementById('obj-locker');
+      if (locker) locker.addEventListener('click', () => {
+        if (state.lockerOpen) {
+          SoundFX.click();
+          setMessage('사물함은 이미 비어 있습니다.');
+          return;
+        }
+        SoundFX.click();
+        openKeypadModal('101호 사물함 (3자리)', '3자리 비밀번호를 입력하세요.', '729', () => {
+          state.lockerOpen = true;
+          SoundFX.unlock();
+          addItem('card_102');
+          addItem('flashlight');
+          setMessage('사물함이 열렸습니다! [102호 카드키]와 [자외선 손전등]을 획득했습니다.');
+          renderScene();
+        });
+      });
+
+      // Room 102
+      const mirror = document.getElementById('obj-mirror');
+      if (mirror) mirror.addEventListener('click', () => {
+        if (state.mirrorRevealed) {
+          SoundFX.click();
+          setMessage('거울에 비친 암호: 103호 키패드 [3815] / 시약 순서 [파랑 → 노랑 → 빨강 → 초록]');
+          return;
+        }
+        if (state.selectedItem === 'flashlight') {
+          state.mirrorRevealed = true;
+          state.selectedItem = null;
+          SoundFX.unlock();
+          addClue('mirror', '102호 거울 암호', '103호 코드: 3815 | 시약 순서: 파랑 → 노랑 → 빨강 → 초록');
+          renderInventory();
+          renderScene();
+          setMessage('손전등을 비추자 거울 너머에 숨겨진 글씨가 선명하게 드러났습니다!');
+        } else {
+          SoundFX.click();
+          setMessage('너무 어두워서 보이지 않습니다. 소지품에서 [자외선 손전등]을 선택해 비춰보세요.');
+        }
+      });
+
+      const recorder = document.getElementById('obj-recorder');
+      if (recorder) recorder.addEventListener('click', () => {
+        SoundFX.beep();
+        openModal('연구원의 녹음기', `
+          <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2 text-slate-300">
+            <p class="text-xs text-red-400 font-mono">▶ PLAYBACK - LOG #44</p>
+            <p>"지직... 102호 거울 뒤에 103호 코드와 시약 순서를 적어뒀다. 불을 모두 끄고 손전등으로 비춰야만 보일 거야... 감시자가 오기 전에 서둘러..."</p>
+          </div>
+        `);
+      });
+
+      // Room 103
+      document.querySelectorAll('.vial-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (state.labSolved) return;
+          const color = btn.dataset.vial;
+          const target = ['blue', 'yellow', 'red', 'green'];
+          if (color === target[state.labSeq.length]) {
+            SoundFX.beep();
+            state.labSeq.push(color);
+            if (state.labSeq.length === 4) {
+              state.labSolved = true;
+              SoundFX.unlock();
+              addItem('master_key');
+              setMessage('시약 배합 성공! 장치 아래에서 [차단기 키]를 획득했습니다.');
+            } else {
+              setMessage(`시약 주입 중 (${state.labSeq.length}/4)`);
+            }
+            renderScene();
+          } else {
+            SoundFX.error();
+            state.labSeq = [];
+            setMessage('경고음과 함께 시약이 초기화되었습니다. 순서를 다시 확인하세요.');
+            renderScene();
+          }
+        });
+      });
+
+      const terminal = document.getElementById('obj-terminal');
+      if (terminal) terminal.addEventListener('click', () => {
+        SoundFX.beep();
+        addClue('exit_formula', '비상구 최종 코드 공식', '설립 연도(2019) - 당신의 피험자 번호(07) = 2012');
+        openModal('연구 책임자 단말기', `
+          <div class="bg-[#052e16] p-4 rounded-xl border border-emerald-500/40 font-mono text-emerald-200 space-y-2 text-xs sm:text-sm">
+            <div>&gt; SYSTEM: EMERGENCY EXIT OVERRIDE</div>
+            <div>&gt; FORMULA: [설립 연도] - [피험자 번호]</div>
+            <div class="text-emerald-400">&gt; 힌트: 101호 명판(2019)과 복도 수칙(07)을 확인하세요.</div>
+          </div>
+        `);
+      });
+    }
+
+    // ==========================================
+    // Reusable Keypad Modal
+    // ==========================================
+    function openKeypadModal(title, subtitle, answer, onSuccess) {
+      let inputVal = '';
+      const renderPad = () => {
+        openModal(title, `
+          <p class="text-xs sm:text-sm text-slate-300">${subtitle}</p>
+          <div id="kp-display" class="w-full py-3 rounded-xl bg-black/70 border border-red-500/40 text-center text-2xl font-mono font-bold tracking-[0.4em] text-red-300">
+            ${inputVal.padEnd(answer.length, '•')}
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            ${[1,2,3,4,5,6,7,8,9,'C',0,'OK'].map(k => `
+              <button data-key="${k}" class="kp-btn py-3 rounded-xl font-bold text-base transition cursor-pointer ${
+                k === 'OK' ? 'bg-red-600 hover:bg-red-500 text-white' :
+                k === 'C' ? 'bg-slate-700 hover:bg-slate-600 text-slate-200' :
+                'bg-white/10 hover:bg-white/20 text-white'
+              }">${k}</button>
+            `).join('')}
+          </div>
+        `, (body) => {
+          body.querySelectorAll('.kp-btn').forEach(b => {
+            b.addEventListener('click', () => {
+              const k = b.dataset.key;
+              if (k === 'C') {
+                SoundFX.click();
+                inputVal = '';
+                renderPad();
+              } else if (k === 'OK') {
+                if (inputVal === answer) {
+                  closeModal();
+                  onSuccess();
+                } else {
+                  SoundFX.error();
+                  inputVal = '';
+                  const disp = body.querySelector('#kp-display');
+                  disp.classList.add('animate-shake');
+                  setTimeout(() => renderPad(), 350);
+                }
+              } else if (inputVal.length < answer.length) {
+                SoundFX.beep();
+                inputVal += k;
+                renderPad();
+              }
+            });
+          });
+        });
+      };
+      renderPad();
+    }
+
+    // ==========================================
+    // Notebook, Hint, Share & Victory
+    // ==========================================
+    function openNotebook() {
+      SoundFX.click();
+      if (state.clues.length === 0) {
+        openModal('단서 수첩', '<p class="text-slate-400 text-center py-6">아직 발견한 단서가 없습니다.</p>');
+        return;
+      }
+      openModal('단서 수첩', `
+        <div class="space-y-2.5">
+          ${state.clues.map(c => `
+            <div class="rounded-xl bg-white/5 border border-white/10 p-3 space-y-1">
+              <div class="text-xs font-bold text-red-300">${c.title}</div>
+              <div class="text-sm text-slate-200">${c.detail}</div>
+            </div>
+          `).join('')}
+        </div>
+      `);
+    }
+
+    function openHint() {
+      SoundFX.click();
+      state.hintsUsed++;
+      let text = '';
+      if (!state.lockerOpen) {
+        text = '101호 대기실의 [피험자 진료 차트]를 읽고, 실종자 번호 마지막 자리 3개(729)로 사물함을 여세요.';
+      } else if (!state.mirrorRevealed) {
+        text = '102호 카드키로 102호에 들어간 뒤, [자외선 손전등]을 선택해 어두운 매직 미러를 클릭하세요.';
+      } else if (!state.labSolved) {
+        text = '103호 약품실(3815)에 들어가 거울에서 본 순서(파랑 → 노랑 → 빨강 → 초록)대로 시약을 누르세요.';
+      } else if (!state.exitBreakerUnlocked) {
+        text = '중앙 복도의 [비상 탈출구]에 103호에서 얻은 [차단기 키]를 먼저 사용하세요.';
+      } else {
+        text = '101호 명판의 설립 연도(2019)에서 복도 수칙의 피험자 번호(07)를 뺀 숫자(2012)를 비상구 키패드에 입력하세요.';
+      }
+      openModal('💡 탐색 힌트', `
+        <div class="rounded-xl bg-red-500/10 border border-red-500/30 p-4 text-slate-100 leading-relaxed">${text}</div>
+      `);
+    }
+
+    function copyTextFallback(text, feedbackEl) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          if (feedbackEl) feedbackEl.textContent = '복사되었습니다!';
+        }).catch(() => fallbackExec(text, feedbackEl));
+      } else {
+        fallbackExec(text, feedbackEl);
+      }
+    }
+
+    function fallbackExec(text, feedbackEl) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      if (feedbackEl) feedbackEl.textContent = '복사되었습니다!';
+    }
+
+    function openShareModal() {
+      SoundFX.click();
+      const cluesText = state.clues.length
+        ? state.clues.map(c => `- ${c.title}: ${c.detail}`).join('\n')
+        : '아직 발견한 단서 없음';
+      const shareSummary = `[제7호 임상실험동] 진행도 ${getProgressCount()}/4 (${formatTime(state.elapsedSeconds)})\n${cluesText}`;
+      const savePayload = btoa(unescape(encodeURIComponent(JSON.stringify({
+        lockerOpen: state.lockerOpen,
+        room102Unlocked: state.room102Unlocked,
+        mirrorRevealed: state.mirrorRevealed,
+        room103Unlocked: state.room103Unlocked,
+        labSolved: state.labSolved,
+        exitBreakerUnlocked: state.exitBreakerUnlocked,
+        inventory: state.inventory,
+        clues: state.clues,
+        elapsedSeconds: state.elapsedSeconds
+      }))));
+
+      openModal('🔗 초대 · 공유 · 이어하기', `
+        <div class="space-y-4">
+          <div class="space-y-1.5">
+            <div class="text-xs font-semibold text-slate-300">👥 친구 초대 (같은 방에서 실시간 협동)</div>
+            <button id="btn-copy-invite" class="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-xs sm:text-sm font-bold text-white cursor-pointer">
+              🔗 초대 링크 복사하기
+            </button>
+          </div>
+          <div class="space-y-1.5">
+            <div class="text-xs font-semibold text-slate-300">1. 채팅방에 단서 브리핑 공유</div>
+            <button id="btn-copy-clues" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-xs sm:text-sm font-medium cursor-pointer">
+              📋 현재 단서 요약 복사하기
+            </button>
+          </div>
+          <div class="space-y-1.5">
+            <div class="text-xs font-semibold text-slate-300">2. 진행 상태 코드 (친구에게 넘겨 이어하기)</div>
+            <div class="flex gap-2">
+              <input id="save-code-out" readonly value="${savePayload}" class="flex-1 px-3 py-2 rounded-lg bg-black/50 border border-white/15 text-xs font-mono text-slate-300"/>
+              <button id="btn-copy-save" class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-xs font-bold text-white cursor-pointer">복사</button>
+            </div>
+          </div>
+          <div class="space-y-1.5">
+            <div class="text-xs font-semibold text-slate-300">3. 친구가 보낸 코드 불러오기</div>
+            <div class="flex gap-2">
+              <input id="save-code-in" placeholder="코드를 붙여넣으세요" class="flex-1 px-3 py-2 rounded-lg bg-black/50 border border-white/15 text-xs font-mono text-slate-200"/>
+              <button id="btn-load-save" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white cursor-pointer">불러오기</button>
+            </div>
+          </div>
+          <p id="share-feedback" class="text-xs text-emerald-400 text-center min-h-[16px]"></p>
+        </div>
+      `, (body) => {
+        const fb = body.querySelector('#share-feedback');
+        body.querySelector('#btn-copy-invite').addEventListener('click', () => copyTextFallback(Net.inviteUrl(), fb));
+        body.querySelector('#btn-copy-clues').addEventListener('click', () => copyTextFallback(shareSummary, fb));
+        body.querySelector('#btn-copy-save').addEventListener('click', () => copyTextFallback(savePayload, fb));
+        body.querySelector('#btn-load-save').addEventListener('click', () => {
+          const raw = body.querySelector('#save-code-in').value.trim();
+          if (!raw) return;
+          try {
+            const data = JSON.parse(decodeURIComponent(escape(atob(raw))));
+            Object.assign(state, data);
+            state.location = 'corridor';
+            state.selectedItem = null;
+            renderInventory();
+            renderScene();
+            closeModal();
+            setMessage('공유받은 진행 상태를 불러왔습니다!');
+          } catch (e) {
+            fb.textContent = '올바른 진행 코드가 아닙니다.';
+          }
+        });
+      });
+    }
+
+    function triggerVictory() {
+      state.escaped = true;
+      clearInterval(timerInterval);
+      SoundFX.escape();
+      document.getElementById('final-time').textContent = formatTime(state.elapsedSeconds);
+      document.getElementById('final-hints').textContent = `${state.hintsUsed}회`;
+      document.getElementById('victory-screen').classList.remove('hidden');
+    }
+
+    function startNewGame(isRestart) {
+      const prevRound = (state && state.round) || 0;
+      state = createInitialState();
+      state.round = isRestart ? prevRound + 1 : prevRound;
+      state.started = true;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (state.started && !state.escaped) {
+          state.elapsedSeconds++;
+          document.getElementById('timer-display').textContent = formatTime(state.elapsedSeconds);
+        }
+      }, 1000);
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('victory-screen').classList.add('hidden');
+      closeModal();
+      setMessage('[인터콤] "실험을 시작하지. 복도의 문들을 확인하고 탈출 조건을 찾아내라."');
+      renderInventory();
+      renderScene();
+      if (window.Net) Net.onLocalStart();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      state = createInitialState();
+      renderInventory();
+      renderScene();
+
+      document.getElementById('btn-start-game').addEventListener('click', () => {
+        SoundFX.init();
+        SoundFX.click();
+        startNewGame();
+      });
+      document.getElementById('btn-restart').addEventListener('click', () => {
+        SoundFX.click();
+        startNewGame(true);
+      });
+      document.getElementById('btn-back-corridor').addEventListener('click', () => {
+        SoundFX.door();
+        state.location = 'corridor';
+        setMessage('중앙 회색 복도로 나왔습니다.');
+        renderScene();
+      });
+      document.getElementById('btn-notebook').addEventListener('click', openNotebook);
+      document.getElementById('btn-share').addEventListener('click', openShareModal);
+      document.getElementById('btn-hint').addEventListener('click', openHint);
+      document.getElementById('btn-sound').addEventListener('click', (e) => {
+        e.currentTarget.textContent = SoundFX.toggleMute() ? '🔇' : '🔊';
+      });
+      document.getElementById('btn-inspect-item').addEventListener('click', () => {
+        if (!state.selectedItem) return;
+        const item = ITEMS[state.selectedItem];
+        SoundFX.click();
+        openModal(item.name, `
+          <div class="text-center space-y-3 py-2">
+            <div class="text-5xl">${item.icon}</div>
+            <p class="text-slate-300 leading-relaxed">${item.desc}</p>
+          </div>
+        `);
+      });
+      document.getElementById('btn-copy-result').addEventListener('click', (e) => {
+        const txt = `🚪 [제7호 임상실험동] 탈출 성공!\n⏱️ 기록: ${formatTime(state.elapsedSeconds)} | 💡 힌트: ${state.hintsUsed}회`;
+        copyTextFallback(txt, e.currentTarget);
+      });
+      document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+      document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-backdrop') closeModal();
+      });
+    });
+  </script>
+  <!-- ===== 함께하기(실시간 협동) 레이어 ===== -->
+  <div id="net-toasts" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-1.5 pointer-events-none"></div>
+
+  <button id="net-fab" class="fixed bottom-4 right-4 z-[45] px-3 py-2 rounded-xl bg-[#121621] border border-white/15 text-xs text-slate-200 shadow-xl flex items-center gap-1.5 cursor-pointer">
+    <span id="net-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+    <span>👥</span><span id="net-count">연결 중</span>
+    <span id="net-unread" class="hidden px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold">0</span>
+  </button>
+
+  <div id="net-panel" class="hidden fixed bottom-16 right-4 z-[45] w-[300px] max-w-[calc(100vw-2rem)] rounded-2xl bg-[#121621] border border-white/15 shadow-2xl overflow-hidden">
+    <div class="px-3 py-2 border-b border-white/10 flex items-center justify-between">
+      <span class="text-xs font-semibold text-slate-200">함께하는 팀원 · 방 <span id="net-room" class="font-mono text-red-300"></span></span>
+      <button id="net-invite-mini" class="text-[11px] text-red-300 hover:text-red-200 underline cursor-pointer">초대 링크 복사</button>
+    </div>
+    <ul id="net-players" class="px-3 py-2 space-y-1 text-xs text-slate-300 max-h-28 overflow-y-auto"></ul>
+    <div id="net-chat" class="px-3 py-2 h-40 overflow-y-auto space-y-1 text-xs border-t border-white/10 select-text"></div>
+    <form id="net-chat-form" class="flex gap-1.5 p-2 border-t border-white/10">
+      <input id="net-chat-in" maxlength="200" placeholder="팀원에게 메시지" class="flex-1 px-2.5 py-1.5 rounded-lg bg-black/50 border border-white/15 text-xs text-slate-100 select-text" autocomplete="off"/>
+      <button class="px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-xs font-bold text-white cursor-pointer">전송</button>
+    </form>
+  </div>
+
+  <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+  <script>
+  const Net = (() => {
+    const BROKER = 'wss://broker.emqx.io:8084/mqtt';
+    const SHARED_FLAGS = ['lockerOpen','room102Unlocked','mirrorRevealed','room103Unlocked','labSolved','exitBreakerUnlocked','escaped'];
+
+    // ---- 방 코드 & 내 정보 ----
+    const params = new URLSearchParams(location.search);
+    let room = (params.get('room') || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 12).toUpperCase();
+    if (!room) {
+      room = Math.random().toString(36).slice(2, 8).toUpperCase();
+      params.set('room', room);
+      history.replaceState(null, '', location.pathname + '?' + params.toString());
+    }
+    const BASE = 'minsung/escape7/v1/' + room + '/';
+    const myId = Math.random().toString(36).slice(2, 10);
+    let myName = '';
+    try { myName = localStorage.getItem('escape7_name') || ''; } catch (e) {}
+    if (!myName) myName = '피험자' + String(Math.floor(Math.random() * 90) + 10);
+
+    const players = {};        // id -> {name, loc, t}
+    let client = null;
+    let lastSentKey = '';
+    let teamCache = null;      // 가장 최근에 받은 팀 상태
+    let unread = 0;
+
+    const inviteUrl = () => location.origin + location.pathname + '?room=' + room;
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    // ---- 공유 상태 ----
+    function sharedOf(s) {
+      const o = { round: s.round || 0, started: !!s.started, inventory: [...(s.inventory || [])], clues: (s.clues || []).map(c => ({...c})),
+                  hintsUsed: s.hintsUsed || 0, elapsedSeconds: s.elapsedSeconds || 0 };
+      SHARED_FLAGS.forEach(k => o[k] = !!s[k]);
+      return o;
+    }
+    // 시간(elapsed)은 매초 바뀌므로 변화 감지에서 제외
+    const keyOf = sh => JSON.stringify({...sh, elapsedSeconds: 0, inventory: [...sh.inventory].sort(), clues: sh.clues.map(c => c.id).sort()});
+
+    function mergeInto(target, inc) {
+      SHARED_FLAGS.forEach(k => { if (inc[k]) target[k] = true; });
+      (inc.inventory || []).forEach(id => { if (!target.inventory.includes(id)) target.inventory.push(id); });
+      (inc.clues || []).forEach(c => { if (!target.clues.some(x => x.id === c.id)) target.clues.push(c); });
+      target.hintsUsed = Math.max(target.hintsUsed || 0, inc.hintsUsed || 0);
+      target.elapsedSeconds = Math.max(target.elapsedSeconds || 0, inc.elapsedSeconds || 0);
+    }
+
+    function applyTeam(inc, fromName) {
+      if (!inc || typeof inc !== 'object') return;
+      const myRound = state.round || 0;
+      if ((inc.round || 0) < myRound) { publishState(true); return; }   // 내가 더 최신 판
+      if ((inc.round || 0) > myRound) {
+        // 팀이 새 판을 시작함 → 나도 새로 시작
+        const wasStarted = state.started;
+        state = createInitialState();
+        state.round = inc.round;
+        state.started = wasStarted || inc.started;
+        if (state.started) {
+          document.getElementById('start-screen').classList.add('hidden');
+          document.getElementById('victory-screen').classList.add('hidden');
+          setMessage('[인터콤] "' + (fromName || '팀원') + '이(가) 실험을 다시 시작했다."');
+        }
+      }
+      const before = sharedOf(state);
+      mergeInto(state, inc);
+      const after = sharedOf(state);
+      const incFull = sharedOf(Object.assign({}, inc, { round: state.round, started: state.started }));
+      const teamBehind = keyOf(incFull) !== keyOf(after);   // 받은 상태가 내 것보다 부족하면 다시 퍼뜨림
+      if (keyOf(before) === keyOf(after)) { if (teamBehind) publishState(true); return; }
+
+      // 새로 생긴 것 알림
+      const who = fromName ? fromName + '님' : '팀원';
+      after.inventory.filter(id => !before.inventory.includes(id)).forEach(id => toast(`👥 ${who}이 [${ITEMS[id] ? ITEMS[id].name : id}] 획득`));
+      after.clues.filter(c => !before.clues.some(x => x.id === c.id)).forEach(c => toast(`📋 ${who}이 단서 [${c.title}] 발견`));
+      const newly = SHARED_FLAGS.filter(k => after[k] && !before[k] && k !== 'escaped');
+      if (newly.length) toast(`🔓 ${who}이 장치를 풀었습니다 · 진행 ${getProgressCount()}/4`);
+
+      if (state.started) { renderInventory(); renderScene(); }
+      if (state.escaped && document.getElementById('victory-screen').classList.contains('hidden') && state.started) triggerVictory();
+      publishState(teamBehind);   // 합쳐진 결과를 다시 퍼뜨림
+    }
+
+    function publishState(force) {
+      if (!client || !client.connected || !state || !state.inventory) return;
+      const sh = sharedOf(state);
+      const k = keyOf(sh);
+      if (!force && k === lastSentKey) return;
+      lastSentKey = k;
+      client.publish(BASE + 'state', JSON.stringify({ from: myId, name: myName, s: sh }), { retain: true, qos: 1 });
+    }
+
+    // ---- 접속자 ----
+    function myLoc() {
+      if (!state || !state.started) return '대기 중';
+      if (state.escaped) return '탈출 완료';
+      return LOCATION_NAMES[state.location] || '';
+    }
+    function sendPresence(leave) {
+      if (!client || !client.connected) return;
+      client.publish(BASE + 'presence', JSON.stringify({ id: myId, name: myName, loc: myLoc(), leave: !!leave }));
+    }
+    function renderPlayers() {
+      const now = Date.now();
+      Object.keys(players).forEach(id => { if (now - players[id].t > 16000) delete players[id]; });
+      const list = [{ id: myId, name: myName + ' (나)', loc: myLoc() }, ...Object.entries(players).map(([id, p]) => ({ id, ...p }))];
+      document.getElementById('net-count').textContent = list.length + '명 접속';
+      document.getElementById('net-players').innerHTML = list.map(p =>
+        `<li class="flex justify-between gap-2"><span class="truncate">${esc(p.name)}</span><span class="text-slate-500 shrink-0">${esc(p.loc)}</span></li>`).join('');
+      const sc = document.getElementById('start-team');
+      if (sc) sc.textContent = list.length > 1 ? `지금 이 방에 ${list.length}명이 있어요` : '아직 혼자예요 · 링크를 보내 친구를 부르세요';
+    }
+
+    // ---- 채팅 ----
+    function addChat(name, text, mine, system) {
+      const box = document.getElementById('net-chat');
+      const div = document.createElement('div');
+      div.innerHTML = system
+        ? `<span class="text-slate-500">${esc(text)}</span>`
+        : `<span class="${mine ? 'text-red-300' : 'text-emerald-300'} font-semibold">${esc(name)}</span> <span class="text-slate-200">${esc(text)}</span>`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+      if (!mine && document.getElementById('net-panel').classList.contains('hidden')) {
+        unread++;
+        const u = document.getElementById('net-unread');
+        u.textContent = unread; u.classList.remove('hidden');
+        if (!system) toast(`💬 ${name}: ${text.slice(0, 40)}`);
+      }
+    }
+
+    function toast(msg) {
+      const wrap = document.getElementById('net-toasts');
+      const el = document.createElement('div');
+      el.className = 'px-3 py-1.5 rounded-lg bg-black/85 border border-red-500/30 text-xs text-slate-100 shadow-lg transition-opacity duration-500';
+      el.textContent = msg;
+      wrap.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; }, 3200);
+      setTimeout(() => el.remove(), 3800);
+    }
+
+    function copy(text, msg) {
+      copyTextFallback(text, null);
+      toast(msg || '복사되었습니다!');
+    }
+
+    // ---- 연결 ----
+    function connect() {
+      if (!window.mqtt) { setStatus('offline'); return; }
+      client = mqtt.connect(BROKER, {
+        clientId: 'esc7_' + myId, clean: true, reconnectPeriod: 3000, connectTimeout: 10000,
+        will: { topic: BASE + 'presence', payload: JSON.stringify({ id: myId, leave: true }), qos: 0, retain: false }
+      });
+      client.on('connect', () => {
+        setStatus('online');
+        client.subscribe([BASE + 'state', BASE + 'presence', BASE + 'chat'], { qos: 1 });
+        sendPresence();
+        setTimeout(() => publishState(true), 1200);  // 받은 팀 상태를 먼저 합친 뒤 내 상태 공유
+      });
+      client.on('reconnect', () => setStatus('connecting'));
+      client.on('offline', () => setStatus('offline'));
+      client.on('error', () => setStatus('offline'));
+      client.on('message', (topic, buf) => {
+        let m; try { m = JSON.parse(buf.toString()); } catch (e) { return; }
+        const t = topic.slice(BASE.length);
+        if (t === 'state') {
+          if (!m || m.from === myId) return;
+          teamCache = m.s;
+          applyTeam(m.s, m.name);
+        } else if (t === 'presence') {
+          if (!m || m.id === myId) return;
+          if (m.leave) {
+            if (players[m.id]) addChat('', `${players[m.id].name}님이 나갔습니다`, false, true);
+            delete players[m.id];
+          } else {
+            if (!players[m.id]) { addChat('', `${m.name}님이 들어왔습니다`, false, true); sendPresence(); }
+            players[m.id] = { name: m.name, loc: m.loc, t: Date.now() };
+          }
+          renderPlayers();
+        } else if (t === 'chat') {
+          if (!m || m.id === myId) return;
+          addChat(m.name, String(m.text || ''), false);
+        }
+      });
+    }
+
+    function setStatus(s) {
+      const dot = document.getElementById('net-dot');
+      dot.className = 'w-2 h-2 rounded-full ' + (s === 'online' ? 'bg-emerald-400' : s === 'connecting' ? 'bg-amber-400' : 'bg-slate-500');
+      if (s !== 'online') document.getElementById('net-count').textContent = s === 'connecting' ? '연결 중' : '오프라인';
+      else renderPlayers();
+    }
+
+    // ---- 게임 쪽에서 부르는 훅 ----
+    function onLocalStart() {
+      if (teamCache && (teamCache.round || 0) >= (state.round || 0)) applyTeam(teamCache, null);
+      publishState(true);
+      sendPresence();
+    }
+
+    function init() {
+      document.getElementById('net-room').textContent = room;
+      // 시작 화면: 닉네임 + 초대
+      const nameIn = document.getElementById('start-name');
+      if (nameIn) {
+        nameIn.value = myName;
+        nameIn.addEventListener('input', () => {
+          myName = nameIn.value.trim().slice(0, 12) || myName;
+          try { localStorage.setItem('escape7_name', myName); } catch (e) {}
+          sendPresence(); renderPlayers();
+        });
+      }
+      const inv = document.getElementById('start-invite');
+      if (inv) inv.addEventListener('click', () => copy(inviteUrl(), '초대 링크를 복사했어요! 채팅방에 붙여넣으세요'));
+      document.getElementById('net-invite-mini').addEventListener('click', () => copy(inviteUrl(), '초대 링크를 복사했어요!'));
+
+      document.getElementById('net-fab').addEventListener('click', () => {
+        const p = document.getElementById('net-panel');
+        p.classList.toggle('hidden');
+        if (!p.classList.contains('hidden')) { unread = 0; document.getElementById('net-unread').classList.add('hidden'); }
+      });
+      document.getElementById('net-chat-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const inp = document.getElementById('net-chat-in');
+        const text = inp.value.trim().slice(0, 200);
+        if (!text) return;
+        inp.value = '';
+        addChat(myName, text, true);
+        if (client && client.connected) client.publish(BASE + 'chat', JSON.stringify({ id: myId, name: myName, text }));
+      });
+
+      setInterval(() => publishState(), 600);       // 내 진행 변화 감지 → 팀에 공유
+      setInterval(() => { sendPresence(); renderPlayers(); }, 5000);
+      window.addEventListener('beforeunload', () => sendPresence(true));
+      renderPlayers();
+      connect();
+    }
+
+    return { init, onLocalStart, inviteUrl, copyInvite: () => copy(inviteUrl(), '초대 링크를 복사했어요! 채팅방에 붙여넣으세요'), get room() { return room; } };
+  })();
+  window.addEventListener('DOMContentLoaded', () => Net.init());
+  </script>
+</body>
+</html>
