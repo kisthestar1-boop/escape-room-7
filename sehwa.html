@@ -137,7 +137,7 @@ header.wrap{display:flex;justify-content:space-between;align-items:center;gap:8p
       </div>
     </div>
     <div class="bd">
-      <p>10년 전 밤 9시, 방송부원 <b>서연</b>이 별관 3층에서 사라졌다. 진실을 쫓아 들어온 오늘 밤, 정문 셔터가 내려앉았다. 그리고 복도 어딘가에서… <b style="color:#fca5a5">삐에로 탈을 쓴 누군가</b>가 걷고 있다.</p>
+      <p><span style="color:#fde68a;font-size:12px">※ 판마다 비밀번호·단서·범인이 바뀝니다</span><br>10년 전 밤 9시, 방송부원 <b>서연</b>이 별관 3층에서 사라졌다. 진실을 쫓아 들어온 오늘 밤, 정문 셔터가 내려앉았다. 그리고 복도 어딘가에서… <b style="color:#fca5a5">삐에로 탈을 쓴 누군가</b>가 걷고 있다.</p>
       <p style="color:var(--muted);font-size:13px;margin-top:8px">· 발소리가 가까워지면 <b>3초 안에 숨기</b> → 숨을 참고 버티세요 · 3번 잡히면 끝 · 오답 3연속은 범인을 부릅니다</p>
       <div style="display:flex;gap:6px;margin-top:12px;align-items:center">
         <span style="font-size:12px;color:var(--muted)">내 이름</span>
@@ -235,7 +235,7 @@ header.wrap{display:flex;justify-content:space-between;align-items:center;gap:8p
   <div class="card"><div class="bd">
     <span class="tag" style="color:#fde68a;border-color:rgba(253,230,138,.5)">DAWN · 탈출 성공</span>
     <h2 style="font-size:22px">새벽이 밝았다</h2>
-    <p style="margin-top:8px">깨진 삐에로 탈 아래 드러난 얼굴은 <b>10년 전 방송부 지도교사 윤 선생</b>이었다. 그날 밤 서연은 그의 비리를 방송으로 알리려 했고, 그는 방송실 문을 잠갔다.</p>
+    <p style="margin-top:8px">깨진 삐에로 탈 아래 드러난 얼굴은 <b id="culprit"></b>이었다. 그날 밤 서연은 그의 비밀을 방송으로 알리려 했고, 그는 방송실 문을 잠갔다.</p>
     <p style="margin-top:6px">당신이 맞춘 주파수로 서연의 마지막 테이프가 온 동네에 울려 퍼진다. 멀리서 사이렌 소리가 가까워진다. 옥상 문 너머로 첫 햇살이 쏟아진다.</p>
     <div class="stats"><div>탈출 시간<b id="eTime">-</b></div><div>힌트<b id="eHint">-</b></div><div>등급<b id="eRank">-</b></div></div>
     <button id="copyRes" class="sub">📋 채팅방에 기록 복사</button>
@@ -301,17 +301,34 @@ const ITEMS = {
   tape: { n: '카세트 테이프', i: '📼', d: '라벨: "서연 — 11.26 마지막 방송". 데크에 넣어야 들을 수 있다.' },
   cardkey: { n: '옥상 보안 카드', i: '💳', d: '옥상 비상문 리더기에 대면 열린다.' }
 };
-const CLUES = {
-  schedule: ['학사일정표', '개교기념일 5월 17일 · 사물함 수칙: "비밀번호는 개교기념일의 월×일 (세 자리)"'],
-  record: ['서연 학생기록부', '2학년 3반 출석번호 23번 · 방송부 · 사물함 번호 85'],
-  clock: ['교무실 벽시계', '9시 05분에 멈춰 있다'],
-  roster: ['방송부 지도교사 퇴근부', '윤○○ — 그날 "21:00 퇴근". 숫자에 수정액 자국'],
-  diary: ['서연의 일기 (찢긴 장)', '"교무실 시계가 9시 5분일 때가 방송 시작 15분 전. 그 시계는 원래 20분 느려. 금고 번호도 방송 시작 시각(24시간제)으로 바꿨대."'],
-  periodic: ['주기율표', 'Fe = 26 · O = 8 · Ag = 47'],
-  uv: ['암실 벽 형광 낙서', '"Fe × O + Ag × 내 번호" — 시약장'],
-  freq: ['방송부 게시판', '"우리 주파수 = 87.5 + (내 출석번호 ÷ 10) MHz"'],
-  last: ['서연의 마지막 방송', '"윤 선생님이 장학금을 빼돌렸어요. 증거는 옥상… 누가 문을 잠그고 있어요"']
-};
+let K = {};
+function genK() {
+  const room = new URLSearchParams(location.search).get('room') || 'X';
+  let h = 2166136261; for (const ch of room + '#' + ((state && state.round) || 0)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  const r = () => { h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909); return ((h >>>= 0) % 10000) / 10000; };
+  const pick = a => a[Math.floor(r() * a.length)];
+  const m = 3 + Math.floor(r() * 10), d = 10 + Math.floor(r() * 19), n = 11 + Math.floor(r() * 29);
+  const clk = pick([0, 5, 10, 15, 20, 25, 30]), slow = pick([10, 15, 20, 25]), pre = pick([10, 15, 20]);
+  const start = clk + slow + pre, hh = 21 + Math.floor(start / 60), mm = start % 60;
+  const EL = [['Fe', 26, '철'], ['O', 8, '산소'], ['Ag', 47, '은'], ['Cu', 29, '구리'], ['Na', 11, '나트륨'], ['Zn', 30, '아연'], ['C', 6, '탄소'], ['N', 7, '질소'], ['Mg', 12, '마그네슘'], ['Au', 79, '금']];
+  let e, cab; do { const p = [...EL].sort(() => r() - .5); e = p.slice(0, 3); cab = e[0][1] * e[1][1] + e[2][1] * n; } while (cab < 1000 || cab > 9999);
+  const cul = pick([['10년 전 방송부 지도교사 윤 선생', '윤○○', '방송부 지도교사', '장학금을 빼돌렸어요'], ['당시 행정실장이던 최 실장', '최○○', '행정실장', '학교 공사비를 빼돌렸어요'], ['그날 당직이던 체육교사 강 선생', '강○○', '당직 교사', '시험지를 몰래 팔아 왔어요']]);
+  K = { m, d, n, clk: String(clk).padStart(2, '0'), slow, pre, real: `9시 ${String(clk + slow).padStart(2, '0')}분`, e, cul,
+    locker: String(m * d).padStart(3, '0'), safe: `${hh}${String(mm).padStart(2, '0')}`, cab: String(cab), fq: Math.round((87.5 + n / 10) * 10) / 10 };
+}
+function CL() {
+  return {
+    schedule: ['학사일정표', `개교기념일 ${K.m}월 ${K.d}일 · 사물함 수칙: "비밀번호는 개교기념일의 월×일 (세 자리)"`],
+    record: ['서연 학생기록부', `2학년 3반 출석번호 ${K.n}번 · 방송부`],
+    clock: ['교무실 벽시계', `9시 ${K.clk}분에 멈춰 있다`],
+    roster: [`${K.cul[2]} 퇴근부`, `${K.cul[1]} — 그날 "21:00 퇴근". 숫자에 수정액 자국`],
+    diary: ['서연의 일기 (찢긴 장)', `"교무실 시계가 9시 ${K.clk}분일 때가 방송 시작 ${K.pre}분 전. 그 시계는 원래 ${K.slow}분 느려. 금고 번호도 방송 시작 시각(24시간제)으로 바꿨대."`],
+    periodic: ['주기율표', K.e.map(x => `${x[0]} = ${x[1]}`).join(' · ')],
+    uv: ['암실 벽 형광 낙서', `"${K.e[0][0]} × ${K.e[1][0]} + ${K.e[2][0]} × 내 번호" — 시약장`],
+    freq: ['방송부 게시판', '"우리 주파수 = 87.5 + (내 출석번호 ÷ 10) MHz"'],
+    last: ['서연의 마지막 방송', `"${K.cul[1].replace('○○', '')} 선생님이 ${K.cul[3]}. 증거는 옥상… 누가 문을 잠그고 있어요"`]
+  };
+}
 
 const TOTAL = 900;
 let state = {};
@@ -333,7 +350,7 @@ function createInitialState() {
 
 const $ = id => document.getElementById(id);
 function setMsg(t) { $('msg').textContent = t; }
-function addClue(id) { if (!state.clues.some(c => c.id === id)) { state.clues.push({ id, title: CLUES[id][0], detail: CLUES[id][1] }); hud(); } }
+function addClue(id) { if (!state.clues.some(c => c.id === id)) { state.clues.push({ id, title: CL()[id][0], detail: CL()[id][1] }); hud(); } }
 function addItem(id) { if (!state.inventory.includes(id)) { state.inventory.push(id); SFX.pick(); renderInventory(); } }
 function has(id) { return state.inventory.includes(id); }
 function fmt(s) { s = Math.max(0, s); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
@@ -420,10 +437,10 @@ function clickSpot(id) {
   if (DARK_ROOMS[state.location] && needLight()) return;
   const sel = state.selected;
   switch (id) {
-    case 'board': addClue('schedule'); openModal('게시판 — 학사일정표', `<div class="note">2016학년도 학사일정<br>· 3월 2일 개학식<br>· <b>5월 17일 개교기념일</b> (휴업)<br>· 7월 20일 방학식<br><hr style="margin:8px 0">※ 별관 사물함 수칙: 비밀번호는 <b>개교기념일의 월×일</b> (세 자리)</div>`); break;
+    case 'board': addClue('schedule'); openModal('게시판 — 학사일정표', `<div class="note">2016학년도 학사일정<br>· 3월 2일 개학식<br>· <b>${K.m}월 ${K.d}일 개교기념일</b> (휴업)<br>· 7월 20일 방학식<br><hr style="margin:8px 0">※ 별관 사물함 수칙: 비밀번호는 <b>개교기념일의 월×일</b> (세 자리)</div>`); break;
     case 'locker':
-      if (state.lockerOpen) { setMsg('빈 사물함. 안쪽에 "23"이라고 긁힌 자국이 있다.'); break; }
-      keypad('복도 사물함', '세 자리 비밀번호', '085', () => { state.lockerOpen = true; addItem('torch'); setMsg('사물함이 열렸다. 손전등을 얻었다! 상단 🔦 버튼으로 켜고 끌 수 있다.'); });
+      if (state.lockerOpen) { setMsg('빈 사물함. 안쪽에 숫자가 긁혀 있었지만 알아볼 수 없다.'); break; }
+      keypad('복도 사물함', '세 자리 비밀번호', K.locker, () => { state.lockerOpen = true; addItem('torch'); setMsg('사물함이 열렸다. 손전등을 얻었다! 상단 🔦 버튼으로 켜고 끌 수 있다.'); });
       break;
     case 'toOffice': go('office', '교무실. 종이 냄새와 먼지. 벽시계가 멈춰 있다.'); break;
     case 'toScience': go('science', '과학실. 커튼이 쳐져 완전히 깜깜하다.'); break;
@@ -434,22 +451,22 @@ function clickSpot(id) {
     case 'exit':
       if (sel === 'cardkey') { startFinale(); break; }
       setMsg(has('cardkey') ? '소지품에서 💳 옥상 보안 카드를 선택하고 문을 눌러라.' : '옥상 비상문. 카드 리더기가 붉게 깜빡인다.'); break;
-    case 'clock': addClue('clock'); openModal('벽시계', `<div style="text-align:center;font-size:48px">🕘</div><p style="text-align:center">바늘이 <b>9시 05분</b>에 멈춰 있다. 초침이 떨린다.</p>`); break;
-    case 'shelf': addClue('record'); openModal('서연 학생기록부', `<div class="note">성명: 한서연 · 2학년 3반<br><b>출석번호 23</b> · 동아리: 방송부<br>사물함 번호: 85<br><i>담임 의견: "정의감이 강하고 끝까지 포기하지 않음"</i></div>`); break;
-    case 'roster': addClue('roster'); openModal('방송부 지도교사 퇴근부', `<div class="note">2016.11.26 · 윤○○ · 퇴근 <b>21:00</b><br><span style="color:#9ca3af">숫자 위에 수정액을 바른 흔적이 있다…</span></div>`); break;
+    case 'clock': addClue('clock'); openModal('벽시계', `<div style="text-align:center;font-size:48px">🕘</div><p style="text-align:center">바늘이 <b>9시 ${K.clk}분</b>에 멈춰 있다. 초침이 떨린다.</p>`); break;
+    case 'shelf': addClue('record'); openModal('서연 학생기록부', `<div class="note">성명: 한서연 · 2학년 3반<br><b>출석번호 ${K.n}</b> · 동아리: 방송부<br><i>담임 의견: "정의감이 강하고 끝까지 포기하지 않음"</i></div>`); break;
+    case 'roster': addClue('roster'); openModal(K.cul[2] + ' 퇴근부', `<div class="note">2016.11.26 · ${K.cul[1]} · 퇴근 <b>21:00</b><br><span style="color:#9ca3af">숫자 위에 수정액을 바른 흔적이 있다…</span></div>`); break;
     case 'drawer':
       if (!state.drawerSearched) { state.drawerSearched = true; addItem('battery'); setMsg('서랍 깊숙한 곳에서 여분 건전지를 찾았다.'); }
       else setMsg('서랍은 비었다.'); break;
     case 'safe':
       if (state.safeOpen) { setMsg('금고는 이미 열려 있다.'); break; }
-      keypad('교무실 금고', '네 자리 (24시간제 시각)', '2140', () => { state.safeOpen = true; addItem('tape'); setMsg('금고가 열렸다! 안에 카세트 테이프가 있다.'); }); break;
-    case 'curtain': addClue('uv'); openModal('암실 커튼 뒤', `<p style="color:var(--muted);margin-bottom:8px">손전등 빛에 벽의 형광 글씨가 떠오른다…</p><div class="uv">Fe × O + Ag × 내 번호<br><span style="font-size:13px">→ 시약장</span></div>`); break;
-    case 'periodic': addClue('periodic'); openModal('주기율표 (일부)', `<div class="note" style="font-family:monospace">… <b>8 O</b> 산소 …<br>… <b>26 Fe</b> 철 …<br>… <b>47 Ag</b> 은 …</div>`); break;
-    case 'desk': addClue('diary'); openModal('실험대 아래 — 찢긴 일기장', `<div class="note">${CLUES.diary[1]}</div>`); break;
+      keypad('교무실 금고', '네 자리 (24시간제 시각)', K.safe, () => { state.safeOpen = true; addItem('tape'); setMsg('금고가 열렸다! 안에 카세트 테이프가 있다.'); }); break;
+    case 'curtain': addClue('uv'); openModal('암실 커튼 뒤', `<p style="color:var(--muted);margin-bottom:8px">손전등 빛에 벽의 형광 글씨가 떠오른다…</p><div class="uv">${K.e[0][0]} × ${K.e[1][0]} + ${K.e[2][0]} × 내 번호<br><span style="font-size:13px">→ 시약장</span></div>`); break;
+    case 'periodic': addClue('periodic'); openModal('주기율표 (일부)', `<div class="note" style="font-family:monospace">${[...K.e].sort((a, b) => a[1] - b[1]).map(x => `… <b>${x[1]} ${x[0]}</b> ${x[2]} …`).join('<br>')}</div>`); break;
+    case 'desk': addClue('diary'); openModal('실험대 아래 — 찢긴 일기장', `<div class="note">${CL().diary[1]}</div>`); break;
     case 'skeleton': setMsg('골격 모형의 고개가… 아까와 다른 쪽을 보고 있다.'); SFX.laugh(.03); break;
     case 'cabinet':
       if (state.cabinetOpen) { setMsg('시약장은 비었다.'); break; }
-      keypad('시약장', '네 자리', '1289', () => { state.cabinetOpen = true; addItem('extinguisher'); addItem('masterkey'); setMsg('시약장이 열렸다! 낡은 소화기와 방송실 마스터키를 얻었다.'); }); break;
+      keypad('시약장', '네 자리', K.cab, () => { state.cabinetOpen = true; addItem('extinguisher'); addItem('masterkey'); setMsg('시약장이 열렸다! 낡은 소화기와 방송실 마스터키를 얻었다.'); }); break;
     case 'board2': addClue('freq'); openModal('방송부 게시판', `<div class="note">📻 세화 방송부 — "우리의 목소리를 지켜요"<br><br><b>우리 주파수 = 87.5 + (내 출석번호 ÷ 10) MHz</b><br><span style="color:#9ca3af">- 서연 -</span></div>`); break;
     case 'deck':
       if (state.tapeInserted) { setMsg('테이프가 들어 있다. 콘솔에서 주파수를 맞춰 송출해야 한다.'); break; }
@@ -507,9 +524,9 @@ function openRadio() {
     body.querySelector('#fm').onclick = () => { s.value = +s.value - 1; upd(); };
     body.querySelector('#fp').onclick = () => { s.value = +s.value + 1; upd(); };
     body.querySelector('#fsend').onclick = () => {
-      if (Math.abs(f - 89.8) < .05) {
+      if (Math.abs(f - K.fq) < .05) {
         state.wrongStreak = 0; state.radioSolved = true; SFX.morse(); addClue('last'); addItem('cardkey');
-        body.innerHTML = `<div class="note">…지지직… <b>"${CLUES.last[1].replace(/"/g, '')}"</b> …딸깍.</div><p style="margin-top:10px">콘솔 아래에서 <b>옥상 보안 카드</b>가 튀어나왔다!</p>`;
+        body.innerHTML = `<div class="note">…지지직… <b>"${CL().last[1].replace(/"/g, '')}"</b> …딸깍.</div><p style="margin-top:10px">콘솔 아래에서 <b>옥상 보안 카드</b>가 튀어나왔다!</p>`;
         setMsg('서연의 목소리가 송출됐다. 옥상 보안 카드를 얻었다 — 복도 끝 비상문으로!'); renderScene();
       } else wrong(d);
     };
@@ -523,10 +540,10 @@ function openNotebook() {
 function openHint() {
   SFX.click(); state.hintsUsed++; state.remainingSeconds = Math.max(1, state.remainingSeconds - 30); hud();
   let t;
-  if (!state.lockerOpen) t = '복도 게시판의 개교기념일(5월 17일) → 5×17 = 85 → 사물함에 085';
-  else if (!state.cabinetOpen) t = '손전등을 켜고 과학실: 커튼 뒤 형광 낙서 + 주기율표 + 교무실 기록부 출석번호 23 → 26×8 + 47×23 = 1289';
-  else if (!state.safeOpen) t = '과학실 실험대의 일기: 멈춘 9:05는 20분 느림 → 실제 9:25, 방송 시작은 15분 뒤 9:40 → 금고에 2140';
-  else if (!state.radioSolved) t = '마스터키를 선택해 방송실 문 → 테이프를 선택해 데크 → 콘솔 87.5 + 2.3 = 89.8 MHz 송출';
+  if (!state.lockerOpen) t = `복도 게시판의 개교기념일(${K.m}월 ${K.d}일) → ${K.m}×${K.d} = ${K.m * K.d} → 사물함에 ${K.locker}`;
+  else if (!state.cabinetOpen) t = `손전등을 켜고 과학실: 커튼 뒤 형광 낙서 + 주기율표 + 교무실 기록부 출석번호 ${K.n} → ${K.e[0][1]}×${K.e[1][1]} + ${K.e[2][1]}×${K.n} = ${K.cab}`;
+  else if (!state.safeOpen) t = `과학실 실험대의 일기: 멈춘 9:${K.clk}는 ${K.slow}분 느림 → 실제 ${K.real}, 방송 시작은 ${K.pre}분 뒤 → 금고에 ${K.safe}`;
+  else if (!state.radioSolved) t = `마스터키를 선택해 방송실 문 → 테이프를 선택해 데크 → 콘솔 87.5 + ${K.n}÷10 = ${K.fq} MHz 송출`;
   else t = '💳 카드를 선택해 옥상 비상문 → 돌진하는 순간 🧯 소화기를 고르고 삐에로를 눌러라!';
   openModal('💡 힌트 (-30초)', `<div style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);border-radius:10px;padding:12px">${t}</div>`);
 }
@@ -686,7 +703,7 @@ function startFinale() {
 }
 
 function triggerVictory() {
-  state.escaped = true; clearInterval(tick);
+  state.escaped = true; clearInterval(tick); $('culprit').textContent = K.cul[0];
   SFX.win();
   const used = TOTAL - state.remainingSeconds;
   const rank = state.hintsUsed === 0 && state.killer.strikes === 0 ? 'S' : (state.hintsUsed <= 1 && state.killer.strikes <= 1 ? 'A' : 'B');
@@ -706,6 +723,7 @@ function startNewGame(isRestart) {
   state = createInitialState();
   state.round = isRestart ? prevRound + 1 : prevRound;
   state.started = true;
+  genK();
   clearInterval(tick);
   let sub = 0;
   tick = setInterval(() => {
@@ -771,7 +789,7 @@ function endIntro() { clearTimeout(introT); const v = $('introVid'); v.pause(); 
 
 // ================= 바인딩 =================
 window.addEventListener('DOMContentLoaded', () => {
-  state = createInitialState(); renderInventory(); renderScene();
+  state = createInitialState(); genK(); renderInventory(); renderScene();
   $('btn-start-game').onclick = () => { SFX.init(); SFX.droneOn(); SFX.click(); playIntro(); };
   $('skip').onclick = () => { SFX.click(); endIntro(); };
   $('back').onclick = () => go('corridor', '복도로 나왔다. 긴 복도 끝 비상문이 붉게 깜빡인다.');
@@ -828,7 +846,7 @@ const Team = (() => {
     const mine = state.round || 0;
     if ((inc.round || 0) < mine) { publish(true); return; }
     if ((inc.round || 0) > mine) {
-      const was = state.started; state = createInitialState(); state.round = inc.round; state.started = was || inc.started;
+      const was = state.started; state = createInitialState(); state.round = inc.round; state.started = was || inc.started; genK();
       if (state.started) { ['start', 'ending', 'over'].forEach(i => $(i).classList.add('hidden')); setMsg('[알림] ' + (from || '팀원') + '님이 새 판을 시작했다.'); }
     }
     const before = shared(state); merge(state, inc); const after = shared(state);
