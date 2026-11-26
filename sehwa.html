@@ -9,7 +9,7 @@
 :root{--bg:#050609;--panel:#0e1018;--line:rgba(255,255,255,.12);--accent:#a855f7;--red:#ef4444;--text:#e2e8f0;--muted:#94a3b8}
 body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;user-select:none;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
 button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
-input{font:inherit}
+input{font:inherit;-webkit-user-select:text;user-select:text;font-size:16px}
 .hidden{display:none!important}
 .wrap{width:100%;max-width:1040px;padding:10px 12px}
 header.wrap{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
@@ -614,6 +614,9 @@ function startHide() {
   const c = $('slitClown'); c.style.transition = 'none'; c.style.left = '-40%'; void c.offsetWidth; c.style.transition = 'left 4.5s linear';
   $('hideOv').classList.remove('hidden');
   setTimeout(() => { c.style.left = '110%'; }, 50);
+  const easy = progress() < 3;
+  $('holdBtn').classList.toggle('hidden', easy); $('breath').classList.toggle('hidden', easy);
+  $('hideOv').querySelector('p').innerHTML = easy ? '숨었다… 숨죽이고 기다린다. 삐에로가 지나간다.' : '숨었다! 삐에로가 지나갈 때까지 아래 버튼을 <u>꾹 누르고</u> 있어라 (후반부라 더 예민해졌다)';
   let held = false, breath = 100, t = 0, exposed = 0;
   const hb = $('holdBtn');
   const down = e => { e.preventDefault(); held = true; hb.classList.add('holding'); };
@@ -627,7 +630,7 @@ function startHide() {
     if (held) breath -= 1.4; else { breath = Math.min(100, breath + 1); if (t > 1.5) exposed += .1; }
     $('breathFill').style.width = Math.max(0, breath) + '%';
     if (Math.random() < .25) SFX.step(.1);
-    const fail = exposed >= 1.5 || breath <= 0;
+    const fail = !easy && (exposed >= 1.5 || breath <= 0);
     if (fail || t >= 4.6) {
       clearInterval(iv); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', ku); up();
       $('hideOv').classList.add('hidden');
