@@ -243,7 +243,7 @@ header.wrap{display:flex;justify-content:space-between;align-items:center;gap:8p
   </div></div>
 </div>
 
-<div id="nameOv" class="ov hidden" style="z-index:90"><div class="card"><div class="bd"><span class="tag">ENTER</span><h2 style="font-size:20px">이름을 알려 주세요</h2><p style="color:var(--muted);font-size:13px;margin-top:4px">팀원들에게 이 이름으로 보여요</p><input id="nameIn" maxlength="12" style="width:100%;margin-top:10px;background:#000;border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--text);user-select:text" autocomplete="off"><button id="nameOk" class="big">입장하기</button></div></div></div>
+<div id="nameOv" class="ov hidden" style="z-index:90"><div class="card"><div class="bd"><span class="tag">ENTER</span><h2 style="font-size:20px">이름을 알려 주세요</h2><p style="color:var(--muted);font-size:13px;margin-top:4px">팀원들에게 이 이름으로 보여요</p><input id="nameIn" maxlength="12" style="width:100%;margin-top:10px;background:#000;border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--text);user-select:text" autocomplete="off"><button id="nameOk" class="big">입장하기</button><button id="nameSkip" class="sub">이름 없이 바로 입장</button></div></div></div>
 <div id="toasts"></div>
 <button id="tFab"><span id="tDot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#64748b;margin-right:5px"></span>👥 <span id="tCount">연결 중</span> <b id="tUnread" class="hidden" style="background:#ef4444;border-radius:99px;padding:0 5px;margin-left:3px">0</b></button>
 <div id="tPanel" class="hidden">
@@ -922,7 +922,7 @@ const Team = (() => {
     if (!named) {
       $('nameOv').classList.remove('hidden');
       const ok = () => { const v = $('nameIn').value.trim().slice(0, 12); if (!v) return; setName(v); $('nameOv').classList.add('hidden'); if (pendingJoin !== null) autoJoin(pendingJoin); };
-      $('nameOk').onclick = ok; $('nameIn').onkeydown = e => e.key === 'Enter' && ok(); setTimeout(() => $('nameIn').focus(), 100);
+      $('nameOk').onclick = ok; $('nameSkip').onclick = () => { setName(myName); $('nameOv').classList.add('hidden'); if (pendingJoin !== null) autoJoin(pendingJoin); }; $('nameIn').onkeydown = e => e.key === 'Enter' && ok(); setTimeout(() => $('nameIn').focus(), 100);
     }
     renderPlayers(); connect();
   });
