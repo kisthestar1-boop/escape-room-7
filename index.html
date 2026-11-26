@@ -148,6 +148,7 @@
     </div>
 
     <div class="flex items-center gap-1.5 sm:gap-2">
+      <div id="net-header-players" class="flex items-center gap-1 max-w-[46vw] sm:max-w-none overflow-hidden"></div>
       <div id="timer-display" class="bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs sm:text-sm font-mono text-slate-200">
         00:00
       </div>
@@ -1247,10 +1248,20 @@
       Object.keys(players).forEach(id => { if (now - players[id].t > 16000) delete players[id]; });
       const list = [{ id: myId, name: myName + ' (나)', loc: myLoc() }, ...Object.entries(players).map(([id, p]) => ({ id, ...p }))];
       document.getElementById('net-count').textContent = list.length + '명 접속';
+      const hp = document.getElementById('net-header-players');
+      if (hp) {
+        const MAX = 5;
+        const chips = list.slice(0, MAX).map((p, i) =>
+          `<span ${i === 0 ? 'data-me="1"' : ''} title="${i === 0 ? '눌러서 이름 바꾸기' : esc(p.loc)}" class="${i === 0 ? 'cursor-pointer ' : ''}flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] sm:text-xs font-medium border whitespace-nowrap ${i === 0 ? 'bg-red-500/15 border-red-500/30 text-red-200' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'}"><span class="w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-red-400' : 'bg-emerald-400'}"></span>${esc(i === 0 ? myName : p.name)}</span>`).join('');
+        const more = list.length > MAX ? `<span class="px-1.5 py-1 rounded-lg text-[11px] text-slate-400 bg-white/5 border border-white/10">+${list.length - MAX}</span>` : '';
+        hp.innerHTML = chips + more;
+        const me = hp.querySelector('[data-me]');
+        if (me) me.addEventListener('click', openRename);
+      }
       document.getElementById('net-players').innerHTML = list.map(p =>
         `<li class="flex justify-between gap-2"><span class="truncate">${esc(p.name)}</span><span class="text-slate-500 shrink-0">${esc(p.loc)}</span></li>`).join('');
       const sc = document.getElementById('start-team');
-      if (sc) sc.textContent = list.length > 1 ? `지금 이 방에 ${list.length}명이 있어요` : '아직 혼자예요 · 링크를 보내 친구를 부르세요';
+      if (sc) sc.textContent = list.length > 1 ? `지금 이 방에 ${list.length}명이 있어요 · 누군가 시작하면 모두 자동으로 참석해요` : '아직 혼자예요 · 링크를 보내 친구를 부르세요';
     }
 
     // ---- 채팅 ----
@@ -1308,6 +1319,7 @@
           if (!m || m.from === myId) return;
           teamCache = m.s;
           applyTeam(m.s, m.name);
+          if (!state.started && m.s && m.s.started) autoJoin(m.name);
         } else if (t === 'presence') {
           if (!m || m.id === myId) return;
           if (m.leave) {
@@ -1330,6 +1342,32 @@
       dot.className = 'w-2 h-2 rounded-full ' + (s === 'online' ? 'bg-emerald-400' : s === 'connecting' ? 'bg-amber-400' : 'bg-slate-500');
       if (s !== 'online') document.getElementById('net-count').textContent = s === 'connecting' ? '연결 중' : '오프라인';
       else renderPlayers();
+    }
+
+    // 링크로 들어왔는데 팀이 이미 플레이 중이면 바로 참석
+    function autoJoin(fromName) {
+      if (state.started) return;
+      startNewGame(false);
+      toast(`🚪 팀 게임에 참석했습니다${fromName ? ' · ' + fromName + '님과 함께' : ''}`);
+      setMessage('[인터콤] "새 피험자가 합류했다. 팀원들과 함께 탈출 조건을 찾아라."');
+    }
+
+    function openRename() {
+      openModal('내 이름 바꾸기', `
+        <div class="space-y-3">
+          <input id="rename-in" maxlength="12" value="${esc(myName)}" class="w-full px-3 py-2.5 rounded-lg bg-black/50 border border-white/15 text-sm text-slate-100 select-text" autocomplete="off"/>
+          <button id="rename-ok" class="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-sm font-bold text-white cursor-pointer">저장</button>
+        </div>`, body => {
+        const inp = body.querySelector('#rename-in');
+        const save = () => {
+          const v = inp.value.trim().slice(0, 12);
+          if (v) { myName = v; try { localStorage.setItem('escape7_name', v); } catch (e) {} const sn = document.getElementById('start-name'); if (sn) sn.value = v; sendPresence(); renderPlayers(); }
+          closeModal();
+        };
+        body.querySelector('#rename-ok').addEventListener('click', save);
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') save(); });
+        setTimeout(() => inp.focus(), 50);
+      });
     }
 
     // ---- 게임 쪽에서 부르는 훅 ----
